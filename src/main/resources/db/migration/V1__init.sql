@@ -5,7 +5,7 @@ CREATE TABLE hospital_finance.supplier (
     supplier_name VARCHAR(255) NOT NULL,
     cnpj VARCHAR(18) NOT NULL UNIQUE,
     email VARCHAR(50),
-    telefone VARCHAR(30)
+    phone_number VARCHAR(30)
 );
 
 CREATE TABLE hospital_finance.nota_fiscal (
@@ -31,7 +31,7 @@ CREATE TABLE hospital_finance.boleto (
 CREATE TABLE hospital_finance.comprovante_pagamento (
     id SERIAL PRIMARY KEY,
     boleto_id INTEGER NOT NULL UNIQUE REFERENCES hospital_finance.boleto(id),
-    data_pagamento DATE NOT NULL,
-    valor_pago NUMERIC(15, 2) NOT NULL,
+    payment_date DATE NOT NULL,
+    paid_value NUMERIC(15, 2) NOT NULL,
     file_reference VARCHAR(200) NOT NULL
 );

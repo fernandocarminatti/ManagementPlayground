@@ -1,0 +1,84 @@
+package com.edu.ManagementPlayground.Entity;
+
+import jakarta.persistence.*;
+
+import java.time.LocalDate;
+import java.util.Objects;
+
+@Entity
+@Table(name = "nota_fiscal", schema = "hospital_finance")
+public class NotaFiscal {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
+
+    @Column(name = "number")
+    private String numberIdentifier;
+    @Column(name = "issue_date")
+    private LocalDate issueDate;
+    @Column(name = "total_value")
+    private double totalValue;
+    @Column(name = "file_reference")
+    private String fileReference;
+
+    @ManyToOne
+    private Supplier supplier;
+
+    public NotaFiscal() {}
+
+    public NotaFiscal(String numberIdentifier, LocalDate issueDate, double totalValue, String fileReference, Supplier supplier) {
+        this.numberIdentifier = numberIdentifier;
+        this.issueDate = issueDate;
+        this.totalValue = totalValue;
+        this.fileReference = fileReference;
+        this.supplier = supplier;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public String getNumberIdentifier() {
+        return numberIdentifier;
+    }
+
+    public LocalDate getIssueDate() {
+        return issueDate;
+    }
+
+    public double getTotalValue() {
+        return totalValue;
+    }
+
+    public String getFileReference() {
+        return fileReference;
+    }
+
+    public Supplier getSupplier() {
+        return supplier;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        NotaFiscal that = (NotaFiscal) o;
+        return id == that.id && Objects.equals(numberIdentifier, that.numberIdentifier) && Objects.equals(supplier, that.supplier);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, numberIdentifier, supplier);
+    }
+
+    @Override
+    public String toString() {
+        return "NotaFiscal{" +
+                "numberIdentifier='" + numberIdentifier + '\'' +
+                ", issueDate=" + issueDate +
+                ", totalValue=" + totalValue +
+                ", fileReference='" + fileReference + '\'' +
+                ", supplier=" + supplier +
+                '}';
+    }
+}
