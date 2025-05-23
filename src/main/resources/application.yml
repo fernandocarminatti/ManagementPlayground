@@ -1,0 +1,33 @@
+spring:
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE}
+  application:
+    name: ManagementPlayground
+  datasource:
+    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      connection-timeout: 30000
+  flyway:
+    schemas: hospital_finance
+    default-schema: hospital_finance
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO}
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        default-schema: hospital_finance
+server:
+  port: ${SPRING_SERVER_PORT}
+logging:
+  level:
+    root: INFO
+    org.hibernate.SQL: DEBUG
+    org.flywaydb: DEBUG
