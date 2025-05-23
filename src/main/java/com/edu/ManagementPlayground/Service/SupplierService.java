@@ -10,7 +10,7 @@ import java.util.Optional;
 
 @Service
 public class SupplierService {
-    SupplierRepository supplierRepository;
+    private final SupplierRepository supplierRepository;
 
     SupplierService(SupplierRepository supplierRepository){
         this.supplierRepository = supplierRepository;

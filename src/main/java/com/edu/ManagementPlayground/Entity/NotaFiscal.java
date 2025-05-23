@@ -59,6 +59,26 @@ public class NotaFiscal {
         return supplier;
     }
 
+    public void setNumberIdentifier(String numberIdentifier) {
+        this.numberIdentifier = numberIdentifier;
+    }
+
+    public void setIssueDate(LocalDate issueDate) {
+        this.issueDate = issueDate;
+    }
+
+    public void setTotalValue(double totalValue) {
+        this.totalValue = totalValue;
+    }
+
+    public void setFileReference(String fileReference) {
+        this.fileReference = fileReference;
+    }
+
+    public void setSupplier(Supplier supplier) {
+        this.supplier = supplier;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
