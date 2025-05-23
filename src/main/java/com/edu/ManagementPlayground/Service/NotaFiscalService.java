@@ -1,6 +1,7 @@
 package com.edu.ManagementPlayground.Service;
 
 import com.edu.ManagementPlayground.Dto.NotaFiscalRegisterDto;
+import com.edu.ManagementPlayground.Dto.NotaFiscalResponseDto;
 import com.edu.ManagementPlayground.Entity.NotaFiscal;
 import com.edu.ManagementPlayground.Entity.Supplier;
 import com.edu.ManagementPlayground.Repository.NotaFiscalRepository;
@@ -21,8 +22,8 @@ public class NotaFiscalService {
         this.supplierRepository = supplierRepository;
     }
 
-    public List<NotaFiscal> getAllNotaFiscal(){
-        return notaFiscalRepository.findAll();
+    public List<NotaFiscalResponseDto> getAllNotaFiscal(){
+        return notaFiscalRepository.findAllWithSupplierId();
     }
 
     public boolean registerNotaFiscal(NotaFiscalRegisterDto notaFiscalRegisterDto){

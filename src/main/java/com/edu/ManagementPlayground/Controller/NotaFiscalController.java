@@ -21,7 +21,7 @@ public class NotaFiscalController {
 
     @GetMapping()
     public ResponseEntity<List<NotaFiscalResponseDto>> getAllSuppliers(){
-        List<NotaFiscalResponseDto> allSuppliers = notaFiscalService.getAllNotaFiscal().stream().map(NotaFiscalResponseDto::fromEntity).toList();
+        List<NotaFiscalResponseDto> allSuppliers = notaFiscalService.getAllNotaFiscal();
         return ResponseEntity.status(200).body(allSuppliers);
     }
 

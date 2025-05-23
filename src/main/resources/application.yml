@@ -17,9 +17,9 @@ spring:
     default-schema: hospital_finance
   jpa:
     open-in-view: false
+    show-sql: false
     hibernate:
       ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO}
-    show-sql: true
     properties:
       hibernate:
         format_sql: true
