@@ -2,6 +2,7 @@ package com.edu.ManagementPlayground.Entity;
 
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Objects;
 
@@ -15,7 +16,7 @@ public class ComprovantePagamento {
     @Column(name = "payment_date")
     private LocalDate paymentDate;
     @Column(name = "paid_value")
-    private double value;
+    private BigDecimal value;
     @Column(name = "file_reference")
     private String fileReference;
 
@@ -25,7 +26,7 @@ public class ComprovantePagamento {
 
     public ComprovantePagamento() {}
 
-    public ComprovantePagamento(LocalDate paymentDate, double value, String fileReference, Boleto boleto) {
+    public ComprovantePagamento(LocalDate paymentDate, BigDecimal value, String fileReference, Boleto boleto) {
         this.paymentDate = paymentDate;
         this.value = value;
         this.fileReference = fileReference;
@@ -40,7 +41,7 @@ public class ComprovantePagamento {
         return paymentDate;
     }
 
-    public double getValue() {
+    public BigDecimal getValue() {
         return value;
     }
 

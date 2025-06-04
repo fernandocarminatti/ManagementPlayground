@@ -2,6 +2,7 @@ package com.edu.ManagementPlayground.Entity;
 
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Objects;
 
@@ -18,7 +19,7 @@ public class NotaFiscal {
     @Column(name = "issue_date")
     private LocalDate issueDate;
     @Column(name = "total_value")
-    private double totalValue;
+    private BigDecimal totalValue;
     @Column(name = "file_reference")
     private String fileReference;
 
@@ -27,7 +28,7 @@ public class NotaFiscal {
 
     public NotaFiscal() {}
 
-    public NotaFiscal(String numberIdentifier, LocalDate issueDate, double totalValue, String fileReference, Supplier supplier) {
+    public NotaFiscal(String numberIdentifier, LocalDate issueDate, BigDecimal totalValue, String fileReference, Supplier supplier) {
         this.numberIdentifier = numberIdentifier;
         this.issueDate = issueDate;
         this.totalValue = totalValue;
@@ -47,7 +48,7 @@ public class NotaFiscal {
         return issueDate;
     }
 
-    public double getTotalValue() {
+    public BigDecimal getTotalValue() {
         return totalValue;
     }
 
@@ -67,7 +68,7 @@ public class NotaFiscal {
         this.issueDate = issueDate;
     }
 
-    public void setTotalValue(double totalValue) {
+    public void setTotalValue(BigDecimal totalValue) {
         this.totalValue = totalValue;
     }
 

@@ -25,7 +25,7 @@ public class SupplierController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> createNewSupplier(@RequestBody SupplierRegisterDto supplierRegisterDto){
+    public ResponseEntity<Void> createNewSupplier(@RequestBody SupplierRegisterDto supplierRegisterDto){
         boolean registrationOperation = supplierService.registerSupplier(supplierRegisterDto);
         if(registrationOperation){
             return ResponseEntity.status(201).build();
@@ -34,7 +34,7 @@ public class SupplierController {
     }
 
     @PutMapping("/update")
-    public ResponseEntity<?> updateSupplier(@RequestBody SupplierRegisterDto supplierRegisterDto){
+    public ResponseEntity<Void> updateSupplier(@RequestBody SupplierRegisterDto supplierRegisterDto){
         boolean updateOperation = supplierService.updateSupplier(supplierRegisterDto);
         return updateOperation ? ResponseEntity.status(200).build() : ResponseEntity.status(400).build();
     }

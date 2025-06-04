@@ -26,7 +26,7 @@ public class NotaFiscalController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> createNewSupplier(@RequestBody NotaFiscalRegisterDto notaFiscalRegisterDto){
+    public ResponseEntity<Void> createNewSupplier(@RequestBody NotaFiscalRegisterDto notaFiscalRegisterDto){
         boolean registrationOperation = notaFiscalService.registerNotaFiscal(notaFiscalRegisterDto);
         if(registrationOperation){
             return ResponseEntity.status(201).build();
@@ -35,7 +35,7 @@ public class NotaFiscalController {
     }
 
     @PutMapping("/update")
-    public ResponseEntity<?> updateSupplier(@RequestBody NotaFiscalRegisterDto notaFiscalRegisterDto){
+    public ResponseEntity<Void> updateSupplier(@RequestBody NotaFiscalRegisterDto notaFiscalRegisterDto){
         boolean updateOperation = notaFiscalService.updateNotaFiscal(notaFiscalRegisterDto);
         return updateOperation ? ResponseEntity.status(200).build() : ResponseEntity.status(400).build();
     }

@@ -2,9 +2,10 @@ package com.edu.ManagementPlayground.Dto;
 
 import com.edu.ManagementPlayground.Entity.NotaFiscal;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
-public record NotaFiscalResponseDto(String numberIdentifier, LocalDate issueDate, double totalValue, String fileReference, long supplierIdentifier) {
+public record NotaFiscalResponseDto(String numberIdentifier, LocalDate issueDate, BigDecimal totalValue, String fileReference, long supplierIdentifier) {
 
     public static NotaFiscalResponseDto fromEntity(NotaFiscal notaFiscal){
         return new NotaFiscalResponseDto(
