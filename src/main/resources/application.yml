@@ -31,3 +31,6 @@ logging:
     root: INFO
     org.hibernate.SQL: DEBUG
     org.flywaydb: DEBUG
+
+file:
+  upload-dir: ./uploads

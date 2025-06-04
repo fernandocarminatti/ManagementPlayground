@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface NotaFiscalRepository extends JpaRepository<NotaFiscal, Long> {
+    boolean existsByfileReference(String fileReference);
     boolean existsByNumberIdentifier(String numberIdentifier);
     Optional<NotaFiscal> findByNumberIdentifier(String numberIdentifier);
     @Query("SELECT new com.edu.ManagementPlayground.Dto.NotaFiscalResponseDto(nf.numberIdentifier, nf.issueDate, nf.totalValue, nf.fileReference, nf.supplier.id) FROM NotaFiscal nf")
