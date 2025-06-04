@@ -1,13 +1,13 @@
 package com.edu.ManagementPlayground.Dto;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PastOrPresent;
-import jakarta.validation.constraints.Positive;
+import com.edu.ManagementPlayground.Dto.CustomValidation.FileSize;
+import com.edu.ManagementPlayground.Dto.CustomValidation.FileType;
+import jakarta.validation.constraints.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 public record NotaFiscalRegisterDto(
         @NotBlank(message = "Must contain identifier number.")
@@ -26,6 +26,8 @@ public record NotaFiscalRegisterDto(
         @NotNull(message = "Supplier identification must be assigned.")
         Long supplierId,
 
-        @NotNull(message = "File must be provided. Supported formats are .pdf and .xml")
-        MultipartFile objectFile
+        @NotEmpty(message = "File must be provided.")
+        @FileSize(max = 10 * 1024 * 1024, message = "File cannot exceed 10MB")
+        @FileType(allowed = {"application/pdf", "application/xml"}, message = "Allowed formats are XML and PDF.")
+        List<MultipartFile> objectFile
 ) {}
