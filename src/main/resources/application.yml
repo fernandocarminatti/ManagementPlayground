@@ -12,6 +12,7 @@ spring:
       maximum-pool-size: 10
       minimum-idle: 2
       connection-timeout: 30000
+      auto-commit: false
   flyway:
     schemas: hospital_finance
     default-schema: hospital_finance
@@ -32,5 +33,8 @@ logging:
     org.hibernate.SQL: DEBUG
     org.flywaydb: DEBUG
 
-file:
-  upload-dir: ./uploads
+storage:
+  upload-default: ./uploads
+  upload-notafiscal: ./uploads/notafiscal
+  upload-boleto: ./uploads/boleto
+  upload-pagamento: ./uploads/pagamento

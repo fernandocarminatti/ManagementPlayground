@@ -4,6 +4,7 @@ import com.edu.ManagementPlayground.Dto.NotaFiscalRegisterDto;
 import com.edu.ManagementPlayground.Dto.NotaFiscalResponseDto;
 import com.edu.ManagementPlayground.Entity.NotaFiscal;
 import com.edu.ManagementPlayground.Entity.Supplier;
+import com.edu.ManagementPlayground.Enum.StorageContext;
 import com.edu.ManagementPlayground.Repository.NotaFiscalRepository;
 import com.edu.ManagementPlayground.Repository.SupplierRepository;
 import org.springframework.core.io.Resource;
@@ -35,10 +36,9 @@ public class NotaFiscalService {
         if(!existsCheck){
             return null;
         }
-
         Resource resource;
         try {
-            resource = storageService.loadAsResource(fileReference);
+            resource = storageService.loadAsResource(fileReference, StorageContext.NOTAFISCAL);
         } catch (RuntimeException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "File not found: " + fileReference, e);
         }
@@ -50,7 +50,7 @@ public class NotaFiscalService {
             return false;
         }
         Supplier supplierReference = supplierRepository.getReferenceById(notaFiscalRegisterDto.supplierId());
-        String savedFilePath = storageService.storeFile(notaFiscalRegisterDto.objectFile(), notaFiscalRegisterDto.supplierId());
+        String savedFilePath = storageService.storeFile(notaFiscalRegisterDto.objectFile(), StorageContext.NOTAFISCAL);
         NotaFiscal notaFiscal = new NotaFiscal(
                 notaFiscalRegisterDto.numberIdentifier(),
                 notaFiscalRegisterDto.issueDate(),
