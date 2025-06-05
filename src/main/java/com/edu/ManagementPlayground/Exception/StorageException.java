@@ -1,4 +1,4 @@
-package com.edu.ManagementPlayground.Exceptions;
+package com.edu.ManagementPlayground.Exception;
 
 public class StorageException extends RuntimeException{
     public StorageException(String message) {

@@ -1,4 +1,4 @@
-package com.edu.ManagementPlayground.Exceptions;
+package com.edu.ManagementPlayground.Exception;
 
 import jakarta.validation.UnexpectedTypeException;
 import org.springframework.http.ResponseEntity;
