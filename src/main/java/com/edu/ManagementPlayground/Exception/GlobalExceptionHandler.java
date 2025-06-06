@@ -1,5 +1,6 @@
 package com.edu.ManagementPlayground.Exception;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.UnexpectedTypeException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -15,7 +16,7 @@ import java.util.Map;
 @ControllerAdvice
 public class GlobalExceptionHandler {
     @ExceptionHandler(IllegalArgumentException.class)
-    protected ResponseEntity<Map<String, Object>> handleIllegalArgumentException(IllegalArgumentException e) {
+    private ResponseEntity<Map<String, Object>> handleIllegalArgumentException(IllegalArgumentException e) {
         Map<String, Object> errorsReturn = new HashMap<>();
         List<String> errorList = new ArrayList<>();
         errorList.add(e.getMessage());
@@ -24,7 +25,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    protected ResponseEntity<Map<String, Object>> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+    private ResponseEntity<Map<String, Object>> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
         Map<String, Object> errorsReturn = new HashMap<>();
         List<String> errorList = new ArrayList<>();
         e.getBindingResult().getAllErrors().forEach(error -> errorList.add(error.getDefaultMessage()));
@@ -43,11 +44,16 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(StorageException.class)
-    protected ResponseEntity<Map<String, Object>> handleStorageException(StorageException e) {
+    private ResponseEntity<Map<String, Object>> handleStorageException(StorageException e) {
         Map<String, Object> errorsReturn = new HashMap<>();
         List<String> errorList = new ArrayList<>();
         errorList.add(e.getMessage());
         errorsReturn.put("Reasons: ", errorList);
         return ResponseEntity.status(400).body(errorsReturn);
+    }
+
+    @ExceptionHandler(EntityNotFoundException.class)
+    private ResponseEntity<Void> handleEntityNotFoundException(EntityNotFoundException e){
+        return ResponseEntity.status(404).build();
     }
 }
