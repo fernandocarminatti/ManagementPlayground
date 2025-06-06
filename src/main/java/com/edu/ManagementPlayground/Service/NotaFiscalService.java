@@ -58,7 +58,7 @@ public class NotaFiscalService {
     @Transactional
     public void updateNotaFiscal(NotaFiscalUpdateDto notaFiscalUpdateDto){
         NotaFiscal notaFiscal = notaFiscalRepository.findByNumberIdentifier(notaFiscalUpdateDto.numberIdentifier()).
-                orElseThrow(() -> new EntityNotFoundException("Nota Fiscal not found with: " + notaFiscalUpdateDto.numberIdentifier()));
+                orElseThrow(EntityNotFoundException::new);
         Supplier supplierReference = getSupplierReference(notaFiscalUpdateDto.supplierId());
         if(notaFiscalUpdateDto.objectFile() != null){
             storageService.updateFile(notaFiscalUpdateDto.objectFile(), Path.of(notaFiscal.getFileReference()), StorageContext.NOTAFISCAL);
