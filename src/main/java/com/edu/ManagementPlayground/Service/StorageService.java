@@ -76,11 +76,16 @@ public class StorageService {
     }
 
     private Resource getFileSystemResource(Path filePath){
-        Resource resource = new FileSystemResource(filePath);
-        if (resource.exists() && resource.isReadable()) {
-            return resource;
-        } else {
-            throw new StorageException("File could not be found.");
+        return new FileSystemResource(filePath);
+    }
+
+    public void updateFile(MultipartFile multipartFile, Path fileReference, StorageContext context) {
+        try{
+            Path updateFullPath = context.getFolder().resolve(fileReference);
+            checkPathSecurity(updateFullPath);
+            Files.copy(multipartFile.getInputStream(), updateFullPath, StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            throw new StorageException("Could not proceed with file update.");
         }
     }
 }

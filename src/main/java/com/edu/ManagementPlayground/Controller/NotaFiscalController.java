@@ -2,6 +2,7 @@ package com.edu.ManagementPlayground.Controller;
 
 import com.edu.ManagementPlayground.Dto.NotaFiscalRegisterDto;
 import com.edu.ManagementPlayground.Dto.NotaFiscalResponseDto;
+import com.edu.ManagementPlayground.Dto.NotaFiscalUpdateDto;
 import com.edu.ManagementPlayground.Service.NotaFiscalService;
 import com.edu.ManagementPlayground.Service.StorageService;
 import jakarta.validation.Valid;
@@ -33,12 +34,12 @@ public class NotaFiscalController {
     @GetMapping("/uploads/{fileReference:.+}")
     public ResponseEntity<Resource> serveFile(@PathVariable String fileReference) {
         Resource fileToServe = notaFiscalService.getNotaFiscalFile(fileReference);
-        if(fileToServe == null){
-            return ResponseEntity.status(409).build();
+        if(fileToServe.exists() && fileToServe.isReadable()){
+            return ResponseEntity.ok()
+                    .contentType(MediaType.valueOf(MediaType.APPLICATION_PDF_VALUE))
+                    .body(fileToServe);
         }
-        return ResponseEntity.ok()
-                .contentType(MediaType.valueOf(MediaType.APPLICATION_PDF_VALUE))
-                .body(fileToServe);
+        return ResponseEntity.status(404).build();
     }
 
     @PostMapping(value = "/register", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
@@ -50,11 +51,11 @@ public class NotaFiscalController {
         return ResponseEntity.status(409).build();
     }
 
-    /*@PutMapping("/update")
-    public ResponseEntity<Void> updateSupplier(@RequestBody NotaFiscalRegisterDto notaFiscalRegisterDto){
-        boolean updateOperation = notaFiscalService.updateNotaFiscal(notaFiscalRegisterDto);
-        return updateOperation ? ResponseEntity.status(200).build() : ResponseEntity.status(400).build();
-    }*/
+    @PutMapping(value = "/update", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
+    public ResponseEntity<Void> updateSupplier(@Valid @ModelAttribute NotaFiscalUpdateDto notaFiscalUpdateDto){
+        notaFiscalService.updateNotaFiscal(notaFiscalUpdateDto);
+        return ResponseEntity.noContent().build();
+    }
 
 
 }

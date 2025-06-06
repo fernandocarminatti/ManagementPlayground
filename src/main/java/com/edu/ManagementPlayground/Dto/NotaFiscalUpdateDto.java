@@ -11,7 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-public record NotaFiscalRegisterDto(
+public record NotaFiscalUpdateDto(
         @NotBlank(message = "Must contain identifier number.")
         String numberIdentifier,
 
@@ -25,7 +25,6 @@ public record NotaFiscalRegisterDto(
         @NotNull(message = "Supplier identification must be assigned.")
         Long supplierId,
 
-        @NotNull(message = "A File must be present.")
         @FileSize(max = 10 * 1024 * 1024, message = "File cannot exceed 10MB")
         @FileType(allowed = {"application/pdf", "application/xml"}, message = "Allowed formats are XML and PDF.")
         MultipartFile objectFile
