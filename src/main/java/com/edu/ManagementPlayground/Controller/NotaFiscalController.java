@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Set;
 
 @RestController
-@RequestMapping("v1/NotasFiscais")
+@RequestMapping("v1/notasfiscais")
 public class NotaFiscalController {
 
     NotaFiscalService notaFiscalService;
@@ -40,7 +40,7 @@ public class NotaFiscalController {
     }
 
     @PostMapping(value = "/register", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
-    public ResponseEntity<Void> createNewNotaFiscal(@Valid @ModelAttribute NotaFiscalRegisterDto notaFiscalRegisterDto){
+    public ResponseEntity<Void> createNotaFiscal(@Valid @ModelAttribute NotaFiscalRegisterDto notaFiscalRegisterDto){
         boolean registrationOperation = notaFiscalService.registerNotaFiscal(notaFiscalRegisterDto);
         if(registrationOperation){
             return ResponseEntity.status(201).build();
@@ -49,7 +49,7 @@ public class NotaFiscalController {
     }
 
     @PutMapping(value = "/update", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
-    public ResponseEntity<Void> updateSupplier(@Valid @ModelAttribute NotaFiscalUpdateDto notaFiscalUpdateDto){
+    public ResponseEntity<Void> updateNotaFiscal(@Valid @ModelAttribute NotaFiscalUpdateDto notaFiscalUpdateDto){
         notaFiscalService.updateNotaFiscal(notaFiscalUpdateDto);
         return ResponseEntity.noContent().build();
     }

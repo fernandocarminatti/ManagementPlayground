@@ -23,8 +23,8 @@ import org.springframework.mock.web.MockMultipartFile;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -79,7 +79,7 @@ class NotaFiscalServiceTest {
         @DisplayName("Should return a list of NotaFiscal.")
         void getAllNotaFiscal_ShouldReturnListOfDtos() {
             // Arrange
-            List<NotaFiscalResponseDto> expectedDtos = List.of(
+            Set<NotaFiscalResponseDto> expectedDtos = Set.of(
                     new NotaFiscalResponseDto(
                             "1231231231",
                             LocalDate.now(),
@@ -89,7 +89,7 @@ class NotaFiscalServiceTest {
             when(notaFiscalRepository.findAllWithSupplierId()).thenReturn(expectedDtos);
 
             // Act
-            List<NotaFiscalResponseDto> actualDtos = notaFiscalService.getAllNotaFiscal();
+            Set<NotaFiscalResponseDto> actualDtos = notaFiscalService.getAllNotaFiscal();
 
             // Assert
             assertNotNull(actualDtos);

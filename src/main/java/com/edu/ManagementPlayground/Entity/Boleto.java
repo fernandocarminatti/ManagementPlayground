@@ -2,6 +2,7 @@ package com.edu.ManagementPlayground.Entity;
 
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Objects;
 
@@ -12,12 +13,12 @@ public class Boleto {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @Column(name = "typeable_line")
+    private String typeableLine;
     @Column(name = "due_date")
     private LocalDate dueDate;
     @Column(name = "total_value")
-    private double value;
-    @Column(name = "typeable_line")
-    private String typeableLine;
+    private BigDecimal value;
     @Column(name = "payment_status")
     private int paymentStatus;
     @Column(name = "file_reference")
@@ -28,10 +29,10 @@ public class Boleto {
 
     public Boleto() {}
 
-    public Boleto(LocalDate dueDate, double value, String typeableLine, int paymentStatus, String fileReference, NotaFiscal notaFiscal) {
+    public Boleto(String typeableLine, LocalDate dueDate, BigDecimal value,  int paymentStatus, String fileReference, NotaFiscal notaFiscal) {
+        this.typeableLine = typeableLine;
         this.dueDate = dueDate;
         this.value = value;
-        this.typeableLine = typeableLine;
         this.paymentStatus = paymentStatus;
         this.fileReference = fileReference;
         this.notaFiscal = notaFiscal;
@@ -45,7 +46,7 @@ public class Boleto {
         return dueDate;
     }
 
-    public double getValue() {
+    public BigDecimal getValue() {
         return value;
     }
 
@@ -63,6 +64,30 @@ public class Boleto {
 
     public NotaFiscal getNotaFiscal() {
         return notaFiscal;
+    }
+
+    public void setTypeableLine(String typeableLine) {
+        this.typeableLine = typeableLine;
+    }
+
+    public void setDueDate(LocalDate dueDate) {
+        this.dueDate = dueDate;
+    }
+
+    public void setValue(BigDecimal value) {
+        this.value = value;
+    }
+
+    public void setPaymentStatus(int paymentStatus) {
+        this.paymentStatus = paymentStatus;
+    }
+
+    public void setFileReference(String fileReference) {
+        this.fileReference = fileReference;
+    }
+
+    public void setNotaFiscal(NotaFiscal notaFiscal) {
+        this.notaFiscal = notaFiscal;
     }
 
     @Override

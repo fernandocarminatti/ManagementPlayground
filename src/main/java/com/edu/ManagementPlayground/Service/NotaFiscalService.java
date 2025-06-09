@@ -43,7 +43,7 @@ public class NotaFiscalService {
             return false;
         }
         Supplier supplierReference = supplierRepository.getReferenceById(notaFiscalRegisterDto.supplierId());
-        String savedFilePath = storageService.storeFile(notaFiscalRegisterDto.objectFile(), StorageContext.NOTAFISCAL);
+        String savedFilePath = storageService.storeFile(notaFiscalRegisterDto.notaFiscalFile(), StorageContext.NOTAFISCAL);
         NotaFiscal notaFiscal = new NotaFiscal(
                 notaFiscalRegisterDto.numberIdentifier(),
                 notaFiscalRegisterDto.issueDate(),

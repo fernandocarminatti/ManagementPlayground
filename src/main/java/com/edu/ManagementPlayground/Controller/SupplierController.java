@@ -1,7 +1,7 @@
 package com.edu.ManagementPlayground.Controller;
 
 import com.edu.ManagementPlayground.Dto.SupplierRegisterDto;
-import com.edu.ManagementPlayground.Dto.SupplierResponseDto;
+import com.edu.ManagementPlayground.Entity.Supplier;
 import com.edu.ManagementPlayground.Service.SupplierService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,8 +19,8 @@ public class SupplierController {
     }
 
     @GetMapping()
-    public ResponseEntity<List<SupplierResponseDto>> getAllSuppliers(){
-        List<SupplierResponseDto> allSuppliers = supplierService.getAllSuppliers().stream().map(SupplierResponseDto::fromEntity).toList();
+    public ResponseEntity<List<Supplier>> getAllSuppliers(){
+        List<Supplier> allSuppliers = supplierService.getAllSuppliers();
         return ResponseEntity.status(200).body(allSuppliers);
     }
 
