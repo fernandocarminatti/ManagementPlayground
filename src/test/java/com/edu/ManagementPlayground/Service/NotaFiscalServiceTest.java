@@ -76,8 +76,8 @@ class NotaFiscalServiceTest {
     @DisplayName("Tests for getNotaFiscal")
     class GetNotaFiscalTests{
         @Test
-        @DisplayName("Should return a list of NotaFiscal.")
-        void getAllNotaFiscal_ShouldReturnListOfDtos() {
+        @DisplayName("Should return a set of NotaFiscal.")
+        void getAllNotaFiscal_ShouldReturnSetOfDtos() {
             // Arrange
             Set<NotaFiscalResponseDto> expectedDtos = Set.of(
                     new NotaFiscalResponseDto(
@@ -99,7 +99,7 @@ class NotaFiscalServiceTest {
         }
 
         @Test
-        @DisplayName("Should return a Resource for the NotaFiscal .PDF file.")
+        @DisplayName("Should return a Resource for the NotaFiscal PDF file.")
         void getNotaFiscalFile_ShouldReturnResourceFromStorageService() {
             // Arrange
             String fileReference = "some/path/nota.pdf";
