@@ -4,30 +4,27 @@ import com.edu.ManagementPlayground.Dto.NotaFiscalRegisterDto;
 import com.edu.ManagementPlayground.Dto.NotaFiscalResponseDto;
 import com.edu.ManagementPlayground.Dto.NotaFiscalUpdateDto;
 import com.edu.ManagementPlayground.Service.NotaFiscalService;
-import com.edu.ManagementPlayground.Service.StorageService;
 import jakarta.validation.Valid;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("v1/NotasFiscais")
 public class NotaFiscalController {
 
     NotaFiscalService notaFiscalService;
-    StorageService storageService;
 
-    NotaFiscalController(NotaFiscalService notaFiscalService, StorageService storageService){
+    NotaFiscalController(NotaFiscalService notaFiscalService){
         this.notaFiscalService = notaFiscalService;
-        this.storageService = storageService;
     }
 
     @GetMapping()
-    public ResponseEntity<List<NotaFiscalResponseDto>> getAllSuppliers(){
-        List<NotaFiscalResponseDto> allSuppliers = notaFiscalService.getAllNotaFiscal();
+    public ResponseEntity<Set<NotaFiscalResponseDto>> getAllSuppliers(){
+        Set<NotaFiscalResponseDto> allSuppliers = notaFiscalService.getAllNotaFiscal();
         return ResponseEntity.status(200).body(allSuppliers);
     }
 

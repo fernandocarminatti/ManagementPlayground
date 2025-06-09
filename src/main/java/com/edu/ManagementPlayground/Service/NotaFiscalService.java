@@ -14,7 +14,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
 import java.nio.file.Path;
-import java.util.List;
+import java.util.Set;
 
 @Service
 public class NotaFiscalService {
@@ -29,7 +29,7 @@ public class NotaFiscalService {
         this.storageService = storageService;
     }
 
-    public List<NotaFiscalResponseDto> getAllNotaFiscal(){
+    public Set<NotaFiscalResponseDto> getAllNotaFiscal(){
         return notaFiscalRepository.findAllWithSupplierId();
     }
 
