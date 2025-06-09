@@ -14,5 +14,5 @@ public interface NotaFiscalRepository extends JpaRepository<NotaFiscal, Long> {
     Optional<NotaFiscal> findByNumberIdentifier(String numberIdentifier);
     @Query("SELECT new com.edu.ManagementPlayground.Dto.NotaFiscalResponseDto(nf.numberIdentifier, nf.issueDate, nf.totalValue, nf.fileReference, nf.supplier.id) FROM NotaFiscal nf")
     Set<NotaFiscalResponseDto> findAllWithSupplierId();
-
+    NotaFiscal getReferenceByNumberIdentifier(String numberIdentifier);
 }
