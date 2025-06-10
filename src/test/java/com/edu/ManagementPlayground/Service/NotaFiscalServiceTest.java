@@ -7,7 +7,6 @@ import com.edu.ManagementPlayground.Entity.NotaFiscal;
 import com.edu.ManagementPlayground.Entity.Supplier;
 import com.edu.ManagementPlayground.Enum.StorageContext;
 import com.edu.ManagementPlayground.Repository.NotaFiscalRepository;
-import com.edu.ManagementPlayground.Repository.SupplierRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -36,12 +35,12 @@ class NotaFiscalServiceTest {
     @Mock
     private NotaFiscalRepository notaFiscalRepository;
     @Mock
-    private SupplierRepository supplierRepository;
+    private SupplierService supplierService;
     @Mock
     private StorageService storageService;
 
     @InjectMocks
-    private NotaFiscalService notaFiscalService;
+    private com.edu.ManagementPlayground.Service.NotaFiscalService notaFiscalService;
 
     private NotaFiscalRegisterDto notaFiscalRegisterDto;
     private NotaFiscalUpdateDto notaFiscalUpdateDto;
@@ -81,6 +80,7 @@ class NotaFiscalServiceTest {
             // Arrange
             Set<NotaFiscalResponseDto> expectedDtos = Set.of(
                     new NotaFiscalResponseDto(
+                            1L,
                             "1231231231",
                             LocalDate.now(),
                             BigDecimal.TEN,
@@ -126,7 +126,7 @@ class NotaFiscalServiceTest {
             String savedFilePath = "generated/path/nota.pdf";
             Supplier mockSupplier = new Supplier();
             when(notaFiscalRepository.existsByNumberIdentifier(notaFiscalRegisterDto.numberIdentifier())).thenReturn(false);
-            when(supplierRepository.getReferenceById(notaFiscalRegisterDto.supplierId())).thenReturn(mockSupplier);
+            when(supplierService.getSupplierReference(notaFiscalRegisterDto.supplierId())).thenReturn(mockSupplier);
             when(storageService.storeFile(mockFile, StorageContext.NOTAFISCAL)).thenReturn(savedFilePath);
 
             // Act
@@ -153,7 +153,7 @@ class NotaFiscalServiceTest {
 
             // Assert
             assertFalse(result);
-            verify(supplierRepository, never()).getReferenceById(anyLong());
+            verify(supplierService, never()).getSupplierReference(anyLong());
             verify(storageService, never()).storeFile(any(), any());
             verify(notaFiscalRepository, never()).save(any(NotaFiscal.class));
         }
@@ -162,7 +162,7 @@ class NotaFiscalServiceTest {
         void registerNotaFiscal_WhenStorageServiceFails_ShouldNotSaveNotaFiscal() {
             // Arrange
             when(notaFiscalRepository.existsByNumberIdentifier(anyString())).thenReturn(false);
-            when(supplierRepository.getReferenceById(anyLong())).thenReturn(new Supplier());
+            when(supplierService.getSupplierReference(anyLong())).thenReturn(new Supplier());
             when(storageService.storeFile(any(), any())).thenThrow(new RuntimeException("Disk is full!"));
 
             // Act & Assert
@@ -183,7 +183,7 @@ class NotaFiscalServiceTest {
             NotaFiscal existingNotaFiscal = new NotaFiscal("12345", LocalDate.now(), BigDecimal.TEN, "old/path.pdf", new Supplier());
             Supplier newSupplier = new Supplier();
             when(notaFiscalRepository.findByNumberIdentifier(notaFiscalUpdateDto.numberIdentifier())).thenReturn(Optional.of(existingNotaFiscal));
-            when(supplierRepository.getReferenceById(notaFiscalUpdateDto.supplierId())).thenReturn(newSupplier);
+            when(supplierService.getSupplierReference(notaFiscalUpdateDto.supplierId())).thenReturn(newSupplier);
 
             // Act
             notaFiscalService.updateNotaFiscal(notaFiscalUpdateDto);
@@ -204,7 +204,7 @@ class NotaFiscalServiceTest {
             );
             NotaFiscal existingNotaFiscal = new NotaFiscal("12345", LocalDate.now(), BigDecimal.TEN, "old/path.pdf", new Supplier());
             when(notaFiscalRepository.findByNumberIdentifier(updateDtoWithFile.numberIdentifier())).thenReturn(Optional.of(existingNotaFiscal));
-            when(supplierRepository.getReferenceById(anyLong())).thenReturn(new Supplier());
+            when(supplierService.getSupplierReference(anyLong())).thenReturn(new Supplier());
 
             // Act
             notaFiscalService.updateNotaFiscal(updateDtoWithFile);
@@ -227,6 +227,4 @@ class NotaFiscalServiceTest {
             verify(storageService, never()).updateFile(any(), any(), any());
         }
     }
-
-
 }

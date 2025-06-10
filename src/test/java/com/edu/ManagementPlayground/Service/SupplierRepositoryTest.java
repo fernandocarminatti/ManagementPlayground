@@ -2,7 +2,7 @@ package com.edu.ManagementPlayground.Service;
 
 import com.edu.ManagementPlayground.Dto.SupplierRegisterDto;
 import com.edu.ManagementPlayground.Entity.Supplier;
-import com.edu.ManagementPlayground.Repository.SupplierService;
+import com.edu.ManagementPlayground.Repository.SupplierRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -24,7 +24,7 @@ import static org.mockito.Mockito.*;
 class SupplierServiceTest {
 
     @Mock
-    private SupplierService supplierService;
+    private SupplierRepository supplierRepository;
 
     @InjectMocks
     private com.edu.ManagementPlayground.Service.SupplierService supplierService;
@@ -33,7 +33,6 @@ class SupplierServiceTest {
 
     @BeforeEach
     void setUp() {
-        // Common DTO for tests
         supplierDto = new SupplierRegisterDto(
                 "ACME Corp",
                 "12.345.678/0001-99",
@@ -54,7 +53,7 @@ class SupplierServiceTest {
                     new Supplier("Supplier A", "111", "a@a.com", "111"),
                     new Supplier("Supplier B", "222", "b@b.com", "222")
             );
-            when(supplierService.findAll()).thenReturn(expectedSuppliers);
+            when(supplierRepository.findAll()).thenReturn(expectedSuppliers);
 
             // Act
             List<Supplier> actualSuppliers = supplierService.getAllSuppliers();
@@ -63,14 +62,14 @@ class SupplierServiceTest {
             assertNotNull(actualSuppliers);
             assertEquals(2, actualSuppliers.size());
             assertEquals(expectedSuppliers, actualSuppliers);
-            verify(supplierService, times(1)).findAll();
+            verify(supplierRepository, times(1)).findAll();
         }
 
         @Test
         @DisplayName("Should return empty list when no suppliers exist")
         void getAllSuppliers_WhenNoneExist_ShouldReturnEmptyList() {
             // Arrange
-            when(supplierService.findAll()).thenReturn(Collections.emptyList());
+            when(supplierRepository.findAll()).thenReturn(Collections.emptyList());
 
             // Act
             List<Supplier> actualSuppliers = supplierService.getAllSuppliers();
@@ -78,7 +77,7 @@ class SupplierServiceTest {
             // Assert
             assertNotNull(actualSuppliers);
             assertTrue(actualSuppliers.isEmpty());
-            verify(supplierService, times(1)).findAll();
+            verify(supplierRepository, times(1)).findAll();
         }
     }
 
@@ -90,7 +89,7 @@ class SupplierServiceTest {
         @DisplayName("Should save supplier and return true when CNPJ is unique")
         void registerSupplier_WithUniqueCnpj_ShouldSaveAndReturnTrue() {
             // Arrange
-            when(supplierService.existsByCnpj(supplierDto.cnpj())).thenReturn(false);
+            when(supplierRepository.existsByCnpj(supplierDto.cnpj())).thenReturn(false);
 
             // Act
             boolean result = supplierService.registerSupplier(supplierDto);
@@ -98,7 +97,7 @@ class SupplierServiceTest {
             // Assert
             assertTrue(result);
             ArgumentCaptor<Supplier> supplierCaptor = ArgumentCaptor.forClass(Supplier.class);
-            verify(supplierService, times(1)).save(supplierCaptor.capture());
+            verify(supplierRepository, times(1)).save(supplierCaptor.capture());
             Supplier savedSupplier = supplierCaptor.getValue();
             assertEquals(supplierDto.name(), savedSupplier.getName());
             assertEquals(supplierDto.cnpj(), savedSupplier.getCnpj());
@@ -110,14 +109,14 @@ class SupplierServiceTest {
         @DisplayName("Should not save supplier and return false when CNPJ already exists")
         void registerSupplier_WithExistingCnpj_ShouldNotSaveAndReturnFalse() {
             // Arrange
-            when(supplierService.existsByCnpj(supplierDto.cnpj())).thenReturn(true);
+            when(supplierRepository.existsByCnpj(supplierDto.cnpj())).thenReturn(true);
 
             // Act
             boolean result = supplierService.registerSupplier(supplierDto);
 
             // Assert
             assertFalse(result);
-            verify(supplierService, never()).save(any(Supplier.class));
+            verify(supplierRepository, never()).save(any(Supplier.class));
         }
     }
 
@@ -130,7 +129,7 @@ class SupplierServiceTest {
         void updateSupplier_WhenSupplierExists_ShouldUpdateAndReturnTrue() {
             // Arrange
             Supplier existingSupplier = new Supplier("Old Name", supplierDto.cnpj(), "old@email.com", "old-phone");
-            when(supplierService.findByCnpj(supplierDto.cnpj())).thenReturn(Optional.of(existingSupplier));
+            when(supplierRepository.findByCnpj(supplierDto.cnpj())).thenReturn(Optional.of(existingSupplier));
 
             // Act
             boolean result = supplierService.updateSupplier(supplierDto);
@@ -138,7 +137,7 @@ class SupplierServiceTest {
             // Assert
             assertTrue(result);
             ArgumentCaptor<Supplier> supplierCaptor = ArgumentCaptor.forClass(Supplier.class);
-            verify(supplierService, times(1)).save(supplierCaptor.capture());
+            verify(supplierRepository, times(1)).save(supplierCaptor.capture());
             Supplier updatedSupplier = supplierCaptor.getValue();
             assertSame(existingSupplier, updatedSupplier);
             assertEquals(supplierDto.name(), updatedSupplier.getName());
@@ -150,14 +149,14 @@ class SupplierServiceTest {
         @DisplayName("Should not update and return false when supplier does not exist")
         void updateSupplier_WhenSupplierDoesNotExist_ShouldNotUpdateAndReturnFalse() {
             // Arrange
-            when(supplierService.findByCnpj(supplierDto.cnpj())).thenReturn(Optional.empty());
+            when(supplierRepository.findByCnpj(supplierDto.cnpj())).thenReturn(Optional.empty());
 
             // Act
             boolean result = supplierService.updateSupplier(supplierDto);
 
             // Assert
             assertFalse(result);
-            verify(supplierService, never()).save(any(Supplier.class));
+            verify(supplierRepository, never()).save(any(Supplier.class));
         }
     }
 }

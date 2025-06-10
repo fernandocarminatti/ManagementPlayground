@@ -7,7 +7,6 @@ import com.edu.ManagementPlayground.Entity.Boleto;
 import com.edu.ManagementPlayground.Entity.NotaFiscal;
 import com.edu.ManagementPlayground.Enum.StorageContext;
 import com.edu.ManagementPlayground.Repository.BoletoRepository;
-import com.edu.ManagementPlayground.Repository.NotaFiscalRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -35,13 +34,11 @@ import static org.mockito.Mockito.*;
 class BoletoServiceTest {
 
     @Mock
-    private NotaFiscalRepository notaFiscalRepository;
+    private NotaFiscalService notaFiscalService;
     @Mock
     private StorageService storageService;
     @Mock
     private BoletoRepository boletoRepository;
-    @Mock
-    private Boleto existingBoleto;
 
     @InjectMocks
     private BoletoService boletoService;
@@ -64,7 +61,7 @@ class BoletoServiceTest {
                 LocalDate.now().plusDays(1),
                 BigDecimal.TEN,
                 1,
-                "1234567890",
+                1,
                 mockFile
         );
 
@@ -73,7 +70,7 @@ class BoletoServiceTest {
                 LocalDate.now().plusDays(10),
                 BigDecimal.TEN,
                 2,
-                "1234567890",
+                2,
                 mockFile
         );
     }
@@ -87,6 +84,7 @@ class BoletoServiceTest {
             // Arrange
             Set<BoletoResponseDto> expectedDtos = Set.of(
                     new BoletoResponseDto(
+                            1L,
                             "1231231231",
                             LocalDate.now().plusDays(10),
                             BigDecimal.TEN,
@@ -132,7 +130,7 @@ class BoletoServiceTest {
             String savedFilePath = "upload/boleto01.pdf";
             NotaFiscal mockNotaFiscal = new NotaFiscal();
             when(boletoRepository.existsByTypeableLine(boletoRegisterDto.typeableLine())).thenReturn(false);
-            when(notaFiscalRepository.getReferenceByNumberIdentifier(boletoRegisterDto.notaFiscalNumberIdentifier())).thenReturn(mockNotaFiscal);
+            when(notaFiscalService.getNotaFiscalReference(boletoRegisterDto.notaFiscalId())).thenReturn(mockNotaFiscal);
             when(storageService.storeFile(mockFile, StorageContext.BOLETO)).thenReturn(savedFilePath);
 
             // Act
@@ -159,23 +157,23 @@ class BoletoServiceTest {
 
             // Assert
             assertFalse(result);
-            verify(notaFiscalRepository, never()).getReferenceById(anyLong());
+            verify(notaFiscalService, never()).getNotaFiscalReference(anyLong());
             verify(storageService, never()).storeFile(any(), any());
-            verify(notaFiscalRepository, never()).save(any(NotaFiscal.class));
+            verify(boletoRepository, never()).save(any(Boleto.class));
         }
         @Test
         @DisplayName("Should not save Boleto when StorageService throws RuntimeException.")
         void registerBoleto_WhenStorageServiceFails_ShouldNotSaveBoleto() {
             // Arrange
             when(boletoRepository.existsByTypeableLine(anyString())).thenReturn(false);
-            when(notaFiscalRepository.getReferenceByNumberIdentifier(anyString())).thenReturn(new NotaFiscal());
+            when(notaFiscalService.getNotaFiscalReference(anyLong())).thenReturn(new NotaFiscal());
             when(storageService.storeFile(any(), any())).thenThrow(new RuntimeException("Disk is full!"));
 
             // Act & Assert
             assertThrows(RuntimeException.class, () -> {
                 boletoService.registerBoleto(boletoRegisterDto);
             });
-            verify(notaFiscalRepository, never()).save(any(NotaFiscal.class));
+            verify(boletoRepository, never()).save(any(Boleto.class));
         }
     }
 
@@ -194,7 +192,7 @@ class BoletoServiceTest {
             notaFiscalReference.setNumberIdentifier("NF-002");
 
             when(boletoRepository.findByTypeableLine(boletoUpdateDto.typeableLine())).thenReturn(Optional.of(existingBoleto));
-            when(notaFiscalRepository.getReferenceByNumberIdentifier(boletoUpdateDto.notaFiscalNumberIdentifier())).thenReturn(notaFiscalReference);
+            when(notaFiscalService.getNotaFiscalReference(boletoUpdateDto.notaFiscalId())).thenReturn(notaFiscalReference);
 
             // Act
             boletoService.updateBoleto(boletoUpdateDto);
@@ -216,9 +214,9 @@ class BoletoServiceTest {
             // Arrange
             NotaFiscal dummyNF = new NotaFiscal();
             Boleto existingBoleto = new Boleto();
-            BoletoUpdateDto withNullFile = new BoletoUpdateDto("123", LocalDate.now().plusDays(10), BigDecimal.ONE, 1, "456", null);
+            BoletoUpdateDto withNullFile = new BoletoUpdateDto("123", LocalDate.now().plusDays(10), BigDecimal.ONE, 1, 456, null);
             when(boletoRepository.findByTypeableLine(withNullFile.typeableLine())).thenReturn(Optional.of(existingBoleto));
-            when(notaFiscalRepository.getReferenceByNumberIdentifier(withNullFile.notaFiscalNumberIdentifier())).thenReturn(dummyNF);
+            when(notaFiscalService.getNotaFiscalReference(withNullFile.notaFiscalId())).thenReturn(dummyNF);
 
             // Act
             boletoService.updateBoleto(withNullFile);
@@ -234,7 +232,7 @@ class BoletoServiceTest {
             NotaFiscal emptyNF = new NotaFiscal();
             Boleto existingBoleto = new Boleto("12345", LocalDate.now(), BigDecimal.TEN, 1, "boleto01.pdf", emptyNF);
             when(boletoRepository.findByTypeableLine(boletoUpdateDto.typeableLine())).thenReturn(Optional.of(existingBoleto));
-            when(notaFiscalRepository.getReferenceByNumberIdentifier(anyString())).thenReturn(emptyNF);
+            when(notaFiscalService.getNotaFiscalReference(anyLong())).thenReturn(emptyNF);
 
             // Act
             boletoService.updateBoleto(boletoUpdateDto);
