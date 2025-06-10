@@ -37,4 +37,4 @@ storage:
   upload-default: ./uploads
   upload-notafiscal: ./uploads/notafiscal
   upload-boleto: ./uploads/boleto
-  upload-pagamento: ./uploads/pagamento
+  upload-comprovante: ./uploads/comprovante

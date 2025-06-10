@@ -19,15 +19,15 @@ import java.nio.file.Path;
     private Path notaFiscalPath;
     @Value("${storage.upload-boleto}")
     private Path boletoPath;
-    @Value("${storage.upload-pagamento}")
-    private Path pagamentoPath;
+    @Value("${storage.upload-comprovante}")
+    private Path comprovantePath;
 
     @PostConstruct
     public void initContextPaths() {
         StorageContext.DEFAULT.configurePath(basePath);
         StorageContext.NOTAFISCAL.configurePath(notaFiscalPath);
         StorageContext.BOLETO.configurePath(boletoPath);
-        StorageContext.COMPROVANTEPAGAMENTO.configurePath(pagamentoPath);
+        StorageContext.COMPROVANTEPAGAMENTO.configurePath(comprovantePath);
         for (StorageContext context : StorageContext.values()) {
             try {
                 Files.createDirectories(context.getFolder());
