@@ -7,7 +7,6 @@ import com.edu.ManagementPlayground.Entity.NotaFiscal;
 import com.edu.ManagementPlayground.Entity.Supplier;
 import com.edu.ManagementPlayground.Enum.StorageContext;
 import com.edu.ManagementPlayground.Repository.NotaFiscalRepository;
-import com.edu.ManagementPlayground.Repository.SupplierRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.core.io.Resource;
@@ -20,12 +19,12 @@ import java.util.Set;
 public class NotaFiscalService {
 
     private final NotaFiscalRepository notaFiscalRepository;
-    private final SupplierRepository supplierRepository;
+    private final SupplierService supplierService;
     private final StorageService storageService;
 
-    public NotaFiscalService(NotaFiscalRepository notaFiscalRepository, SupplierRepository supplierRepository, StorageService storageService){
+    public NotaFiscalService(NotaFiscalRepository notaFiscalRepository, SupplierService supplierService, StorageService storageService){
         this.notaFiscalRepository = notaFiscalRepository;
-        this.supplierRepository = supplierRepository;
+        this.supplierService = supplierService;
         this.storageService = storageService;
     }
 
@@ -37,12 +36,16 @@ public class NotaFiscalService {
         return storageService.loadAsResource(fileReference, StorageContext.NOTAFISCAL);
     }
 
+    public NotaFiscal getNotaFiscalReference(long id){
+        return notaFiscalRepository.getReferenceById(id);
+    }
+
     @Transactional
     public boolean registerNotaFiscal(NotaFiscalRegisterDto notaFiscalRegisterDto){
         if(notaFiscalRepository.existsByNumberIdentifier(notaFiscalRegisterDto.numberIdentifier())){
             return false;
         }
-        Supplier supplierReference = supplierRepository.getReferenceById(notaFiscalRegisterDto.supplierId());
+        Supplier supplierReference = supplierService.getSupplierReference(notaFiscalRegisterDto.supplierId());
         String savedFilePath = storageService.storeFile(notaFiscalRegisterDto.notaFiscalFile(), StorageContext.NOTAFISCAL);
         NotaFiscal notaFiscal = new NotaFiscal(
                 notaFiscalRegisterDto.numberIdentifier(),
@@ -59,7 +62,7 @@ public class NotaFiscalService {
     public void updateNotaFiscal(NotaFiscalUpdateDto notaFiscalUpdateDto){
         NotaFiscal notaFiscal = notaFiscalRepository.findByNumberIdentifier(notaFiscalUpdateDto.numberIdentifier()).
                 orElseThrow(EntityNotFoundException::new);
-        Supplier supplierReference = getSupplierReference(notaFiscalUpdateDto.supplierId());
+        Supplier supplierReference = supplierService.getSupplierReference(notaFiscalUpdateDto.supplierId());
         if(notaFiscalUpdateDto.objectFile() != null){
             storageService.updateFile(notaFiscalUpdateDto.objectFile(), Path.of(notaFiscal.getFileReference()), StorageContext.NOTAFISCAL);
         }
@@ -69,10 +72,5 @@ public class NotaFiscalService {
         notaFiscal.setSupplier(supplierReference);
 
         notaFiscalRepository.saveAndFlush(notaFiscal);
-    }
-
-
-    private Supplier getSupplierReference(long refIdentifier){
-        return supplierRepository.getReferenceById(refIdentifier);
     }
 }

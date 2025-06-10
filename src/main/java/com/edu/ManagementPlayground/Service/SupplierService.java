@@ -20,6 +20,10 @@ public class SupplierService {
         return supplierRepository.findAll();
     }
 
+    public Supplier getSupplierReference(long id){
+        return supplierRepository.getReferenceById(id);
+    }
+
     public boolean registerSupplier(SupplierRegisterDto supplierRegisterDto){
         if(supplierRepository.existsByCnpj(supplierRegisterDto.cnpj())){
             return false;
