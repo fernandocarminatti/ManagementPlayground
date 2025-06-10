@@ -1,4 +1,4 @@
 package com.edu.ManagementPlayground.Dto;
 
-public record SupplierResponseDto(String name, String cnpj, String email, String phoneNumber) {
+public record SupplierResponseDto(long id, String name, String cnpj, String email, String phoneNumber) {
 }

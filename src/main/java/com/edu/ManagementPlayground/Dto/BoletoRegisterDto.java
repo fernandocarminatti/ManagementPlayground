@@ -25,8 +25,7 @@ public record BoletoRegisterDto(
         int paymentStatus,
 
         @NotNull(message = "Nota Fiscal identification must be assigned.")
-        @NotBlank(message = "Must contain Nota Fiscal number identifier.")
-        String notaFiscalNumberIdentifier,
+        long notaFiscalId,
 
         @NotNull(message = "A File must be present.")
         @FileSize(max = 10 * 1024 * 1024, message = "File cannot exceed 10MB")
