@@ -1,13 +1,14 @@
 package com.edu.ManagementPlayground.Exception;
 
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.UnexpectedTypeException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -20,7 +21,7 @@ public class GlobalExceptionHandler {
         Map<String, Object> errorsReturn = new HashMap<>();
         List<String> errorList = new ArrayList<>();
         errorList.add(e.getMessage());
-        errorsReturn.put("Reasons: ", errorList);
+        errorsReturn.put("Errors: ", errorList);
         return ResponseEntity.status(400).body(errorsReturn);
     }
 
@@ -29,7 +30,7 @@ public class GlobalExceptionHandler {
         Map<String, Object> errorsReturn = new HashMap<>();
         List<String> errorList = new ArrayList<>();
         e.getBindingResult().getAllErrors().forEach(error -> errorList.add(error.getDefaultMessage()));
-        errorsReturn.put("Reasons: ", errorList);
+        errorsReturn.put("Errors: ", errorList);
         return ResponseEntity.status(400).body(errorsReturn);
     }
 
@@ -48,12 +49,68 @@ public class GlobalExceptionHandler {
         Map<String, Object> errorsReturn = new HashMap<>();
         List<String> errorList = new ArrayList<>();
         errorList.add(e.getMessage());
-        errorsReturn.put("Reasons: ", errorList);
+        errorsReturn.put("Errors: ", errorList);
         return ResponseEntity.status(400).body(errorsReturn);
     }
 
-    @ExceptionHandler(EntityNotFoundException.class)
-    private ResponseEntity<Void> handleEntityNotFoundException(EntityNotFoundException e){
-        return ResponseEntity.status(404).build();
+    @ExceptionHandler(BoletoNotFoundException.class)
+    private ResponseEntity<Map<String, Object>> handleBoletoNotFoundException(BoletoNotFoundException e){
+        Map<String, Object> errorMessage = new HashMap<>();
+        errorMessage.put("timestamp", LocalDateTime.now());
+        errorMessage.put("status", HttpStatus.NOT_FOUND.value());
+        errorMessage.put("error", "Not Found");
+        errorMessage.put("message", e.getMessage());
+        return ResponseEntity.status(404).body(errorMessage);
+    }
+
+    @ExceptionHandler(BoletoAlreadyExistsException.class)
+    private ResponseEntity<Map<String, Object>> handleBoletoAlreadyExistsException(BoletoAlreadyExistsException e){
+        Map<String, Object> errorMessage = new HashMap<>();
+        errorMessage.put("timestamp", LocalDateTime.now());
+        errorMessage.put("status", HttpStatus.CONFLICT.value());
+        errorMessage.put("error", "Conflict");
+        errorMessage.put("message", e.getMessage());
+        return ResponseEntity.status(409).body(errorMessage);
+    }
+
+    @ExceptionHandler(NotaFiscalNotFoundException.class)
+    private ResponseEntity<Map<String, Object>> handleNotaFiscalNotFoundException(NotaFiscalNotFoundException e){
+        Map<String, Object> errorMessage = new HashMap<>();
+        errorMessage.put("timestamp", LocalDateTime.now());
+        errorMessage.put("status", HttpStatus.NOT_FOUND.value());
+        errorMessage.put("error", "Not Found");
+        errorMessage.put("message", e.getMessage());
+        return ResponseEntity.status(404).body(errorMessage);
+    }
+
+    @ExceptionHandler(NotaFiscalAlreadyExistsException.class)
+    private ResponseEntity<Map<String, Object>> handleNotaFiscalAlreadyExistsException(NotaFiscalAlreadyExistsException e){
+        Map<String, Object> errorMessage = new HashMap<>();
+        errorMessage.put("timestamp", LocalDateTime.now());
+        errorMessage.put("status", HttpStatus.CONFLICT.value());
+        errorMessage.put("error", "Conflict");
+        errorMessage.put("message", e.getMessage());
+        return ResponseEntity.status(409).body(errorMessage);
+    }
+
+    @ExceptionHandler(ComprovantePagamentoNotFoundException.class)
+    private ResponseEntity<Map<String, Object>> handleComprovantePagamentoNotFoundException(ComprovantePagamentoNotFoundException e){
+        Map<String, Object> errorMessage = new HashMap<>();
+        errorMessage.put("timestamp", LocalDateTime.now());
+        errorMessage.put("status", HttpStatus.NOT_FOUND.value());
+        errorMessage.put("error", "Not Found");
+        errorMessage.put("message", e.getMessage());
+        return ResponseEntity.status(404).body(errorMessage);
+    }
+
+
+    @ExceptionHandler(ComprovantePagamentoAlreadyExistsException.class)
+    private ResponseEntity<Map<String, Object>> handleComprovantePagamentoAlreadyExistsException(ComprovantePagamentoAlreadyExistsException e){
+        Map<String, Object> errorMessage = new HashMap<>();
+        errorMessage.put("timestamp", LocalDateTime.now());
+        errorMessage.put("status", HttpStatus.CONFLICT.value());
+        errorMessage.put("error", "Conflict");
+        errorMessage.put("message", e.getMessage());
+        return ResponseEntity.status(409).body(errorMessage);
     }
 }

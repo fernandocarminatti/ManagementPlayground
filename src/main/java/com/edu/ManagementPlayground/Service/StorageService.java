@@ -88,4 +88,14 @@ public class StorageService {
             throw new StorageException("Could not proceed with file update.");
         }
     }
+
+    public void deleteFile(String fileReference, StorageContext context){
+        try{
+            Path fullPath = context.getFolder().resolve(fileReference);
+            checkPathSecurity(fullPath);
+            Files.deleteIfExists(fullPath);
+        } catch (IOException e) {
+            throw new StorageException("Could not delete File. Make sure its exists.");
+        }
+    }
 }

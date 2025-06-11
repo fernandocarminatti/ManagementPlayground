@@ -6,10 +6,12 @@ import com.edu.ManagementPlayground.Dto.ComprovantePagamentoUpdateDto;
 import com.edu.ManagementPlayground.Entity.Boleto;
 import com.edu.ManagementPlayground.Entity.ComprovantePagamento;
 import com.edu.ManagementPlayground.Enum.StorageContext;
+import com.edu.ManagementPlayground.Exception.ComprovantePagamentoAlreadyExistsException;
+import com.edu.ManagementPlayground.Exception.ComprovantePagamentoNotFoundException;
 import com.edu.ManagementPlayground.Repository.ComprovantePagamentoRepository;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.core.io.Resource;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.nio.file.Path;
@@ -36,9 +38,6 @@ public class ComprovantePagamentoService {
 
     @Transactional
     public boolean registerComprovantePagamento(ComprovantePagamentoRegisterDto comprovantePagamentoRegisterDto){
-        if(comprovantePagamentoRepository.existsByBoletoId(comprovantePagamentoRegisterDto.boletoId())){
-            return false;
-        }
         Boleto boletoReference = boletoService.getBoletoReference(comprovantePagamentoRegisterDto.boletoId());
         String savedFilePath = storageService.storeFile(comprovantePagamentoRegisterDto.comprovanteFile(),  StorageContext.COMPROVANTEPAGAMENTO);
         ComprovantePagamento comprovante = new ComprovantePagamento(
@@ -47,14 +46,19 @@ public class ComprovantePagamentoService {
                 savedFilePath,
                 boletoReference // PROXY REFERENCE
         );
-        comprovantePagamentoRepository.save(comprovante);
-        return true;
+        try{
+            comprovantePagamentoRepository.save(comprovante);
+            return true;
+        } catch(DataIntegrityViolationException e){
+            storageService.deleteFile(savedFilePath, StorageContext.COMPROVANTEPAGAMENTO);
+            throw new ComprovantePagamentoAlreadyExistsException("A Comprovante Pagamento with provided attributes already exists.");
+        }
     }
 
     @Transactional
     public void updateComprovantePagamento(ComprovantePagamentoUpdateDto comprovantePagamentoUpdateDto){
         ComprovantePagamento comprovantePagamento = comprovantePagamentoRepository.findByBoletoId(comprovantePagamentoUpdateDto.boletoId()).
-                orElseThrow(EntityNotFoundException::new);
+                orElseThrow(() -> new ComprovantePagamentoNotFoundException("Could not find any Comprovante Pagamento with provided attributes."));
         Boleto boletoReference = boletoService.getBoletoReference(comprovantePagamentoUpdateDto.boletoId());
         if(comprovantePagamentoUpdateDto.comprovanteFile() != null){
             storageService.updateFile(comprovantePagamentoUpdateDto.comprovanteFile(), Path.of(comprovantePagamento.getFileReference()), StorageContext.COMPROVANTEPAGAMENTO);

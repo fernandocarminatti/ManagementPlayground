@@ -6,10 +6,11 @@ import com.edu.ManagementPlayground.Dto.BoletoUpdateDto;
 import com.edu.ManagementPlayground.Entity.Boleto;
 import com.edu.ManagementPlayground.Entity.NotaFiscal;
 import com.edu.ManagementPlayground.Enum.StorageContext;
+import com.edu.ManagementPlayground.Exception.BoletoNotFoundException;
 import com.edu.ManagementPlayground.Repository.BoletoRepository;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.core.io.Resource;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.nio.file.Path;
@@ -39,9 +40,6 @@ public class BoletoService {
 
     @Transactional
     public boolean registerBoleto(BoletoRegisterDto boletoRegisterDto){
-        if(boletoRepository.existsByTypeableLine(boletoRegisterDto.typeableLine())){
-            return false;
-        }
         NotaFiscal notaFiscalReference = notaFiscalService.getNotaFiscalReference(boletoRegisterDto.notaFiscalId());
         String savedFilePath = storageService.storeFile(boletoRegisterDto.boletoFile(), StorageContext.BOLETO);
         Boleto boleto = new Boleto(
@@ -52,14 +50,19 @@ public class BoletoService {
                 savedFilePath,
                 notaFiscalReference // PROXY reference
         );
-        boletoRepository.save(boleto);
-        return true;
+        try{
+            boletoRepository.save(boleto);
+            return true;
+        } catch (DataIntegrityViolationException e){
+            storageService.deleteFile(savedFilePath, StorageContext.BOLETO);
+            throw new BoletoNotFoundException("A Boleto with provided attributes already exists.");
+        }
     }
 
     @Transactional
     public void updateBoleto(BoletoUpdateDto boletoUpdateDto){
         Boleto boleto = boletoRepository.findByTypeableLine(boletoUpdateDto.typeableLine()).
-                orElseThrow(EntityNotFoundException::new);
+                orElseThrow(() -> new BoletoNotFoundException("Could not find any Boleto with provided attributes."));
         NotaFiscal notaFiscalReference = notaFiscalService.getNotaFiscalReference(boletoUpdateDto.notaFiscalId());
         if(boletoUpdateDto.boletoFile() != null){
             storageService.updateFile(boletoUpdateDto.boletoFile(), Path.of(boleto.getFileReference()), StorageContext.BOLETO);

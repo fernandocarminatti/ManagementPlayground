@@ -6,10 +6,12 @@ import com.edu.ManagementPlayground.Dto.NotaFiscalUpdateDto;
 import com.edu.ManagementPlayground.Entity.NotaFiscal;
 import com.edu.ManagementPlayground.Entity.Supplier;
 import com.edu.ManagementPlayground.Enum.StorageContext;
+import com.edu.ManagementPlayground.Exception.NotaFiscalAlreadyExistsException;
+import com.edu.ManagementPlayground.Exception.NotaFiscalNotFoundException;
 import com.edu.ManagementPlayground.Repository.NotaFiscalRepository;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.core.io.Resource;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.nio.file.Path;
@@ -42,9 +44,6 @@ public class NotaFiscalService {
 
     @Transactional
     public boolean registerNotaFiscal(NotaFiscalRegisterDto notaFiscalRegisterDto){
-        if(notaFiscalRepository.existsByNumberIdentifier(notaFiscalRegisterDto.numberIdentifier())){
-            return false;
-        }
         Supplier supplierReference = supplierService.getSupplierReference(notaFiscalRegisterDto.supplierId());
         String savedFilePath = storageService.storeFile(notaFiscalRegisterDto.notaFiscalFile(), StorageContext.NOTAFISCAL);
         NotaFiscal notaFiscal = new NotaFiscal(
@@ -54,14 +53,19 @@ public class NotaFiscalService {
                 savedFilePath,
                 supplierReference // PROXY reference
         );
-        notaFiscalRepository.save(notaFiscal);
-        return true;
+        try {
+            notaFiscalRepository.save(notaFiscal);
+            return true;
+        } catch (DataIntegrityViolationException e){
+            storageService.deleteFile(savedFilePath, StorageContext.NOTAFISCAL);
+            throw new NotaFiscalAlreadyExistsException("A Nota Fiscal with provided attributes already exists.");
+        }
     }
 
     @Transactional
     public void updateNotaFiscal(NotaFiscalUpdateDto notaFiscalUpdateDto){
         NotaFiscal notaFiscal = notaFiscalRepository.findByNumberIdentifier(notaFiscalUpdateDto.numberIdentifier()).
-                orElseThrow(EntityNotFoundException::new);
+                orElseThrow(() -> new NotaFiscalNotFoundException("Could not find any Nota Fiscal with provided attributes."));
         Supplier supplierReference = supplierService.getSupplierReference(notaFiscalUpdateDto.supplierId());
         if(notaFiscalUpdateDto.objectFile() != null){
             storageService.updateFile(notaFiscalUpdateDto.objectFile(), Path.of(notaFiscal.getFileReference()), StorageContext.NOTAFISCAL);
