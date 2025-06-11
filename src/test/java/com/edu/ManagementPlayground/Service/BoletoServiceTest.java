@@ -134,10 +134,10 @@ class BoletoServiceTest {
             when(storageService.storeFile(mockFile, StorageContext.BOLETO)).thenReturn(savedFilePath);
 
             // Act
-            boolean result = boletoService.registerBoleto(boletoRegisterDto);
+            String result = boletoService.registerBoleto(boletoRegisterDto);
 
             // Assert
-            assertTrue(result);
+            assertNotNull(result);
             ArgumentCaptor<Boleto> boletoCaptor = ArgumentCaptor.forClass(Boleto.class);
             verify(boletoRepository, times(1)).save(boletoCaptor.capture());
             Boleto capturedBoleto = boletoCaptor.getValue();
@@ -153,10 +153,10 @@ class BoletoServiceTest {
             when(boletoRepository.existsByTypeableLine(boletoRegisterDto.typeableLine())).thenReturn(true);
 
             // Act
-            boolean result = boletoService.registerBoleto(boletoRegisterDto);
+            String result = boletoService.registerBoleto(boletoRegisterDto);
 
             // Assert
-            assertFalse(result);
+            assertNotNull(result);
             verify(notaFiscalService, never()).getNotaFiscalReference(anyLong());
             verify(storageService, never()).storeFile(any(), any());
             verify(boletoRepository, never()).save(any(Boleto.class));

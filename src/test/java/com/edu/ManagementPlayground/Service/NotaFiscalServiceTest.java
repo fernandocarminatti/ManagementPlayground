@@ -130,10 +130,10 @@ class NotaFiscalServiceTest {
             when(storageService.storeFile(mockFile, StorageContext.NOTAFISCAL)).thenReturn(savedFilePath);
 
             // Act
-            boolean result = notaFiscalService.registerNotaFiscal(notaFiscalRegisterDto);
+            String result = notaFiscalService.registerNotaFiscal(notaFiscalRegisterDto);
 
             // Assert
-            assertTrue(result);
+            assertNotNull(result);
             ArgumentCaptor<NotaFiscal> notaFiscalCaptor = ArgumentCaptor.forClass(NotaFiscal.class);
             verify(notaFiscalRepository, times(1)).save(notaFiscalCaptor.capture());
             NotaFiscal capturedNota = notaFiscalCaptor.getValue();
@@ -149,10 +149,10 @@ class NotaFiscalServiceTest {
             when(notaFiscalRepository.existsByNumberIdentifier(notaFiscalRegisterDto.numberIdentifier())).thenReturn(true);
 
             // Act
-            boolean result = notaFiscalService.registerNotaFiscal(notaFiscalRegisterDto);
+            String result = notaFiscalService.registerNotaFiscal(notaFiscalRegisterDto);
 
             // Assert
-            assertFalse(result);
+            assertNotNull(result);
             verify(supplierService, never()).getSupplierReference(anyLong());
             verify(storageService, never()).storeFile(any(), any());
             verify(notaFiscalRepository, never()).save(any(NotaFiscal.class));

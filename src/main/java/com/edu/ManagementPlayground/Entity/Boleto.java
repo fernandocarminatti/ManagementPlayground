@@ -66,6 +66,10 @@ public class Boleto {
         return notaFiscal;
     }
 
+    public void setId(long id){
+        this.id = id;
+    }
+
     public void setTypeableLine(String typeableLine) {
         this.typeableLine = typeableLine;
     }
