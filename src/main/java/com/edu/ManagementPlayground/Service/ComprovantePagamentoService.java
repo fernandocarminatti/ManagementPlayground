@@ -49,7 +49,7 @@ public class ComprovantePagamentoService {
     }
 
     @Transactional
-    public boolean registerComprovantePagamento(ComprovantePagamentoRegisterDto comprovantePagamentoRegisterDto){
+    public String registerComprovantePagamento(ComprovantePagamentoRegisterDto comprovantePagamentoRegisterDto){
         Boleto boletoReference = boletoService.getBoletoReference(comprovantePagamentoRegisterDto.boletoId());
         String savedFilePath = storageService.storeFile(comprovantePagamentoRegisterDto.comprovanteFile(),  StorageContext.COMPROVANTEPAGAMENTO);
         ComprovantePagamento comprovante = new ComprovantePagamento(
@@ -60,7 +60,7 @@ public class ComprovantePagamentoService {
         );
         try{
             comprovantePagamentoRepository.save(comprovante);
-            return true;
+            return savedFilePath;
         } catch(DataIntegrityViolationException e){
             storageService.deleteFile(savedFilePath, StorageContext.COMPROVANTEPAGAMENTO);
             throw new ComprovantePagamentoAlreadyExistsException("A Comprovante Pagamento with provided attributes already exists.");

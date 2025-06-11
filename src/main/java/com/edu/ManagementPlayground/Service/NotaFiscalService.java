@@ -56,7 +56,7 @@ public class NotaFiscalService {
     }
 
     @Transactional
-    public boolean registerNotaFiscal(NotaFiscalRegisterDto notaFiscalRegisterDto){
+    public String registerNotaFiscal(NotaFiscalRegisterDto notaFiscalRegisterDto){
         Supplier supplierReference = supplierService.getSupplierReference(notaFiscalRegisterDto.supplierId());
         String savedFilePath = storageService.storeFile(notaFiscalRegisterDto.notaFiscalFile(), StorageContext.NOTAFISCAL);
         NotaFiscal notaFiscal = new NotaFiscal(
@@ -68,7 +68,7 @@ public class NotaFiscalService {
         );
         try {
             notaFiscalRepository.save(notaFiscal);
-            return true;
+            return savedFilePath;
         } catch (DataIntegrityViolationException e){
             storageService.deleteFile(savedFilePath, StorageContext.NOTAFISCAL);
             throw new NotaFiscalAlreadyExistsException("A Nota Fiscal with provided attributes already exists.");

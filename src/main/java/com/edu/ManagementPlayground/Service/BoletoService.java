@@ -6,6 +6,7 @@ import com.edu.ManagementPlayground.Dto.BoletoUpdateDto;
 import com.edu.ManagementPlayground.Entity.Boleto;
 import com.edu.ManagementPlayground.Entity.NotaFiscal;
 import com.edu.ManagementPlayground.Enum.StorageContext;
+import com.edu.ManagementPlayground.Exception.BoletoAlreadyExistsException;
 import com.edu.ManagementPlayground.Exception.BoletoNotFoundException;
 import com.edu.ManagementPlayground.Repository.BoletoRepository;
 import jakarta.transaction.Transactional;
@@ -51,7 +52,7 @@ public class BoletoService {
     }
 
     @Transactional
-    public boolean registerBoleto(BoletoRegisterDto boletoRegisterDto){
+    public String registerBoleto(BoletoRegisterDto boletoRegisterDto){
         NotaFiscal notaFiscalReference = notaFiscalService.getNotaFiscalReference(boletoRegisterDto.notaFiscalId());
         String savedFilePath = storageService.storeFile(boletoRegisterDto.boletoFile(), StorageContext.BOLETO);
         Boleto boleto = new Boleto(
@@ -64,10 +65,10 @@ public class BoletoService {
         );
         try{
             boletoRepository.save(boleto);
-            return true;
+            return savedFilePath;
         } catch (DataIntegrityViolationException e){
             storageService.deleteFile(savedFilePath, StorageContext.BOLETO);
-            throw new BoletoNotFoundException("A Boleto with provided attributes already exists.");
+            throw new BoletoAlreadyExistsException("A Boleto with provided attributes already exists.");
         }
     }
 

@@ -13,7 +13,7 @@ import java.util.List;
 @RequestMapping("v1/suppliers")
 public class SupplierController {
 
-    SupplierService supplierService;
+    private final SupplierService supplierService;
 
     SupplierController(SupplierService supplierService){
         this.supplierService = supplierService;

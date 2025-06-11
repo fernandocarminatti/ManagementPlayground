@@ -10,13 +10,14 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.Set;
 
 @RestController
 @RequestMapping("v1/notasfiscais")
 public class NotaFiscalController {
 
-    NotaFiscalService notaFiscalService;
+    private final NotaFiscalService notaFiscalService;
 
     NotaFiscalController(NotaFiscalService notaFiscalService){
         this.notaFiscalService = notaFiscalService;
@@ -25,13 +26,13 @@ public class NotaFiscalController {
     @GetMapping()
     public ResponseEntity<Set<NotaFiscalResponseDto>> getAllSuppliers(){
         Set<NotaFiscalResponseDto> allSuppliers = notaFiscalService.getAllNotaFiscal();
-        return ResponseEntity.status(200).body(allSuppliers);
+        return ResponseEntity.ok(allSuppliers);
     }
 
     @GetMapping("/{notaFiscalId}")
     public ResponseEntity<NotaFiscalResponseDto> getSupplier(@PathVariable long notaFiscalId){
         NotaFiscalResponseDto responseDto = notaFiscalService.getNotaFiscal(notaFiscalId);
-        return ResponseEntity.status(200).body(responseDto);
+        return ResponseEntity.ok(responseDto);
     }
 
     @GetMapping("/uploads/{fileReference:.+}")
@@ -42,16 +43,13 @@ public class NotaFiscalController {
                     .contentType(MediaType.valueOf(MediaType.APPLICATION_PDF_VALUE))
                     .body(fileToServe);
         }
-        return ResponseEntity.status(404).build();
+        return ResponseEntity.notFound().build();
     }
 
     @PostMapping(value = "/register", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
     public ResponseEntity<Void> createNotaFiscal(@Valid @ModelAttribute NotaFiscalRegisterDto notaFiscalRegisterDto){
-        boolean registrationOperation = notaFiscalService.registerNotaFiscal(notaFiscalRegisterDto);
-        if(registrationOperation){
-            return ResponseEntity.status(201).build();
-        }
-        return ResponseEntity.status(409).build();
+        String notaFiscalFileReference = notaFiscalService.registerNotaFiscal(notaFiscalRegisterDto);
+        return ResponseEntity.created(URI.create("v1/notasfiscais/uploads/" + notaFiscalFileReference)).build();
     }
 
     @PutMapping(value = "/update", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
@@ -59,6 +57,4 @@ public class NotaFiscalController {
         notaFiscalService.updateNotaFiscal(notaFiscalUpdateDto);
         return ResponseEntity.noContent().build();
     }
-
-
 }
