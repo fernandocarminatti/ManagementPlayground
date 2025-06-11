@@ -38,6 +38,18 @@ public class BoletoService {
         return boletoRepository.getReferenceById(id);
     }
 
+    public BoletoResponseDto getBoleto(long id){
+        Boleto boleto = boletoRepository.findById(id).orElseThrow(() -> new BoletoNotFoundException("Could not find any Boleto with given attributes"));
+        return new BoletoResponseDto(
+                boleto.getId(),
+                boleto.getTypeableLine(),
+                boleto.getDueDate(),
+                boleto.getValue(),
+                boleto.getPaymentStatus(),
+                boleto.getFileReference()
+        );
+    }
+
     @Transactional
     public boolean registerBoleto(BoletoRegisterDto boletoRegisterDto){
         NotaFiscal notaFiscalReference = notaFiscalService.getNotaFiscalReference(boletoRegisterDto.notaFiscalId());

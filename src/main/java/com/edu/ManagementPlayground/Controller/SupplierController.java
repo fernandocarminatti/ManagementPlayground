@@ -1,6 +1,7 @@
 package com.edu.ManagementPlayground.Controller;
 
 import com.edu.ManagementPlayground.Dto.SupplierRegisterDto;
+import com.edu.ManagementPlayground.Dto.SupplierResponseDto;
 import com.edu.ManagementPlayground.Entity.Supplier;
 import com.edu.ManagementPlayground.Service.SupplierService;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +23,12 @@ public class SupplierController {
     public ResponseEntity<List<Supplier>> getAllSuppliers(){
         List<Supplier> allSuppliers = supplierService.getAllSuppliers();
         return ResponseEntity.status(200).body(allSuppliers);
+    }
+
+    @GetMapping("/{supplierId}")
+    public ResponseEntity<SupplierResponseDto> getSupplier(@PathVariable long supplierId){
+        SupplierResponseDto responseDto = supplierService.getSupplier(supplierId);
+        return ResponseEntity.status(200).body(responseDto);
     }
 
     @PostMapping("/register")

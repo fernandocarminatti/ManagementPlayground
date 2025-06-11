@@ -28,6 +28,12 @@ public class ComprovantePagamentoController {
         return ResponseEntity.status(200).body(allComprovantes);
     }
 
+    @GetMapping("/{comprovanteId}")
+    public ResponseEntity<ComprovantePagamentoResponseDto> getSupplier(@PathVariable long comprovanteId){
+        ComprovantePagamentoResponseDto responseDto = comprovantePagamentoService.getComprovante(comprovanteId);
+        return ResponseEntity.status(200).body(responseDto);
+    }
+
     @GetMapping("/uploads/{fileReference:.+}")
     public ResponseEntity<Resource> serveComprovanteFile(@PathVariable String fileReference) {
         Resource fileToServe = comprovantePagamentoService.getComprovantePagamentoFile(fileReference);

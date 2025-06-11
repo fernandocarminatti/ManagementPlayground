@@ -28,6 +28,12 @@ public class BoletoController {
         return ResponseEntity.status(200).body(allBoletos);
     }
 
+    @GetMapping("/{boletoId}")
+    public ResponseEntity<BoletoResponseDto> getSupplier(@PathVariable long boletoId){
+        BoletoResponseDto responseDto = boletoService.getBoleto(boletoId);
+        return ResponseEntity.status(200).body(responseDto);
+    }
+
     @GetMapping("/uploads/{fileReference:.+}")
     public ResponseEntity<Resource> serveBoletoResource(@PathVariable String fileReference) {
         Resource fileToServe = boletoService.getBoletoFile(fileReference);

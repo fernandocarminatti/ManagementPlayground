@@ -1,6 +1,7 @@
 package com.edu.ManagementPlayground.Exception;
 
 import jakarta.validation.UnexpectedTypeException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -51,6 +52,11 @@ public class GlobalExceptionHandler {
         errorList.add(e.getMessage());
         errorsReturn.put("Errors: ", errorList);
         return ResponseEntity.status(400).body(errorsReturn);
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    private ResponseEntity<Void> handleDataIntegrityViolationException(DataIntegrityViolationException e){
+        return ResponseEntity.status(400).build();
     }
 
     @ExceptionHandler(BoletoNotFoundException.class)

@@ -32,6 +32,18 @@ public class ComprovantePagamentoService {
 
     public Set<ComprovantePagamentoResponseDto> getAllComprovante() { return comprovantePagamentoRepository.findAllProjection(); }
 
+    public ComprovantePagamentoResponseDto getComprovante(long id){
+        ComprovantePagamento comprovantePagamento = comprovantePagamentoRepository.findById(id).orElseThrow(() -> new ComprovantePagamentoNotFoundException("Could not find any Comprovante Pagamento with provided attributes.") );
+        return new ComprovantePagamentoResponseDto(
+                comprovantePagamento.getId(),
+                comprovantePagamento.getPaymentDate(),
+                comprovantePagamento.getValue(),
+                comprovantePagamento.getBoleto().getId(),
+                comprovantePagamento.getFileReference()
+        );
+    }
+
+
     public Resource getComprovantePagamentoFile(String fileReference){
         return storageService.loadAsResource(fileReference, StorageContext.COMPROVANTEPAGAMENTO);
     }

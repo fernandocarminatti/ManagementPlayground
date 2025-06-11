@@ -34,6 +34,19 @@ public class NotaFiscalService {
         return notaFiscalRepository.findAllWithSupplierId();
     }
 
+
+    public NotaFiscalResponseDto getNotaFiscal(long id){
+        NotaFiscal notafiscal = notaFiscalRepository.findById(id).orElseThrow(() -> new NotaFiscalNotFoundException("Could not find any Nota Fiscal with provided attributes."));
+        return new NotaFiscalResponseDto(
+                notafiscal.getId(),
+                notafiscal.getNumberIdentifier(),
+                notafiscal.getIssueDate(),
+                notafiscal.getTotalValue(),
+                notafiscal.getFileReference(),
+                notafiscal.getSupplier().getId()
+        );
+    }
+
     public Resource getNotaFiscalFile(String fileReference){
         return storageService.loadAsResource(fileReference, StorageContext.NOTAFISCAL);
     }

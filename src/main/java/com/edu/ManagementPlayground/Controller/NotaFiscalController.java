@@ -28,6 +28,12 @@ public class NotaFiscalController {
         return ResponseEntity.status(200).body(allSuppliers);
     }
 
+    @GetMapping("/{notaFiscalId}")
+    public ResponseEntity<NotaFiscalResponseDto> getSupplier(@PathVariable long notaFiscalId){
+        NotaFiscalResponseDto responseDto = notaFiscalService.getNotaFiscal(notaFiscalId);
+        return ResponseEntity.status(200).body(responseDto);
+    }
+
     @GetMapping("/uploads/{fileReference:.+}")
     public ResponseEntity<Resource> serveFile(@PathVariable String fileReference) {
         Resource fileToServe = notaFiscalService.getNotaFiscalFile(fileReference);
