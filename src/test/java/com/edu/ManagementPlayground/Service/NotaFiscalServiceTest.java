@@ -6,8 +6,9 @@ import com.edu.ManagementPlayground.Dto.NotaFiscalUpdateDto;
 import com.edu.ManagementPlayground.Entity.NotaFiscal;
 import com.edu.ManagementPlayground.Entity.Supplier;
 import com.edu.ManagementPlayground.Enum.StorageContext;
+import com.edu.ManagementPlayground.Exception.NotaFiscalAlreadyExistsException;
+import com.edu.ManagementPlayground.Exception.NotaFiscalNotFoundException;
 import com.edu.ManagementPlayground.Repository.NotaFiscalRepository;
-import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -102,7 +103,7 @@ class NotaFiscalServiceTest {
         @DisplayName("Should return a Resource for the NotaFiscal PDF file.")
         void getNotaFiscalFile_ShouldReturnResourceFromStorageService() {
             // Arrange
-            String fileReference = "some/path/nota.pdf";
+            String fileReference = "notafiscal01.pdf";
             Resource mockResource = mock(Resource.class);
             when(storageService.loadAsResource(fileReference, StorageContext.NOTAFISCAL)).thenReturn(mockResource);
 
@@ -114,6 +115,32 @@ class NotaFiscalServiceTest {
             assertEquals(mockResource, result);
             verify(storageService, times(1)).loadAsResource(fileReference, StorageContext.NOTAFISCAL);
         }
+
+        @Test
+        @DisplayName("Should return a Single Nota Fiscal")
+        void getSingleNotaFiscal_ShouldReturnOneDto(){
+            Supplier supplierDummy = new Supplier();
+            supplierDummy.setId(1L);
+            NotaFiscal notaFiscalDummy = new NotaFiscal("123", LocalDate.now(), BigDecimal.TEN, "notafiscal01.pdf", supplierDummy);
+            when(notaFiscalRepository.findById(1L)).thenReturn(Optional.of(notaFiscalDummy));
+
+            NotaFiscalResponseDto serviceReturn = notaFiscalService.getNotaFiscal(1L);
+
+            assertNotNull(serviceReturn);
+            verify(notaFiscalRepository, times(1)).findById(anyLong());
+            assertEquals(notaFiscalDummy.getId(), serviceReturn.id());
+        }
+
+        @Test
+        @DisplayName("Should throw NotaFiscalNotFoundException")
+        void getSingleComprovantePagamento_ShouldThrowComprovantePagamentoNotFoundException(){
+            when(notaFiscalRepository.findById(1L)).thenThrow(new NotaFiscalNotFoundException(""));
+
+            assertThrows(NotaFiscalNotFoundException.class, () -> {
+                        notaFiscalService.getNotaFiscal(1L);
+                    }
+            );
+        }
     }
 
     @Nested
@@ -123,11 +150,10 @@ class NotaFiscalServiceTest {
         @DisplayName("Should persist a NotaFiscal that does not exists yet.")
         void registerNotaFiscal_WhenNotaFiscalDoesNotExist_ShouldSaveAndReturnTrue() {
             // Arrange
-            String savedFilePath = "generated/path/nota.pdf";
+            String fileReference = "notafiscal01.pdf";
             Supplier mockSupplier = new Supplier();
-            when(notaFiscalRepository.existsByNumberIdentifier(notaFiscalRegisterDto.numberIdentifier())).thenReturn(false);
             when(supplierService.getSupplierReference(notaFiscalRegisterDto.supplierId())).thenReturn(mockSupplier);
-            when(storageService.storeFile(mockFile, StorageContext.NOTAFISCAL)).thenReturn(savedFilePath);
+            when(storageService.storeFile(mockFile, StorageContext.NOTAFISCAL)).thenReturn(fileReference);
 
             // Act
             String result = notaFiscalService.registerNotaFiscal(notaFiscalRegisterDto);
@@ -139,29 +165,30 @@ class NotaFiscalServiceTest {
             NotaFiscal capturedNota = notaFiscalCaptor.getValue();
             assertEquals(notaFiscalRegisterDto.numberIdentifier(), capturedNota.getNumberIdentifier());
             assertEquals(notaFiscalRegisterDto.totalValue(), capturedNota.getTotalValue());
-            assertEquals(savedFilePath, capturedNota.getFileReference());
+            assertEquals(fileReference, capturedNota.getFileReference());
             assertEquals(mockSupplier, capturedNota.getSupplier());
         }
         @Test
-        @DisplayName("Should not save new NotaFiscal if its numberIdentifier already exists on db.")
-        void registerNotaFiscal_WhenNotaFiscalAlreadyExists_ShouldNotSaveAndReturnFalse() {
+        @DisplayName("Should not save new NotaFiscal if its ID already exists on db.")
+        void registerNotaFiscal_WhenNotaFiscalAlreadyExists_ShouldThrowNotaFiscalAlreadyExistsException() {
             // Arrange
-            when(notaFiscalRepository.existsByNumberIdentifier(notaFiscalRegisterDto.numberIdentifier())).thenReturn(true);
+            Supplier dummySupplier = new Supplier();
+            when(supplierService.getSupplierReference(1L)).thenReturn(dummySupplier);
+            when(storageService.storeFile(any(), any())).thenReturn("notafiscal01.pdf");
+            when(notaFiscalRepository.save(any())).thenThrow(new NotaFiscalAlreadyExistsException(""));
 
-            // Act
-            String result = notaFiscalService.registerNotaFiscal(notaFiscalRegisterDto);
-
-            // Assert
-            assertNotNull(result);
-            verify(supplierService, never()).getSupplierReference(anyLong());
-            verify(storageService, never()).storeFile(any(), any());
-            verify(notaFiscalRepository, never()).save(any(NotaFiscal.class));
+            assertThrows(NotaFiscalAlreadyExistsException.class, () -> {
+                notaFiscalService.registerNotaFiscal(notaFiscalRegisterDto);
+            });
+            verify(supplierService, times(1)).getSupplierReference(anyLong());
+            verify(storageService, times(1)).storeFile(any(), any());
+            verify(notaFiscalRepository, times(1)).save(any(NotaFiscal.class));
+            verify(storageService, times(1)).deleteFile(any(), any());
         }
         @Test
         @DisplayName("Should not save NotaFiscal when StorageService throws RuntimeException.")
         void registerNotaFiscal_WhenStorageServiceFails_ShouldNotSaveNotaFiscal() {
             // Arrange
-            when(notaFiscalRepository.existsByNumberIdentifier(anyString())).thenReturn(false);
             when(supplierService.getSupplierReference(anyLong())).thenReturn(new Supplier());
             when(storageService.storeFile(any(), any())).thenThrow(new RuntimeException("Disk is full!"));
 
@@ -214,13 +241,12 @@ class NotaFiscalServiceTest {
             verify(notaFiscalRepository, times(1)).saveAndFlush(any(NotaFiscal.class));
         }
         @Test
-        @DisplayName("Should throw EntityNotFoundException.")
-        void updateNotaFiscal_WhenNotaFiscalNotFound_ShouldThrowEntityNotFoundException() {
+        @DisplayName("Should throw NotaFiscalNotFoundException.")
+        void updateNotaFiscal_WhenNotaFiscalNotFound_ShouldThrowNotaFiscalNotFoundException() {
             // Arrange
-            when(notaFiscalRepository.findByNumberIdentifier(notaFiscalUpdateDto.numberIdentifier())).thenReturn(Optional.empty());
+            when(notaFiscalRepository.findByNumberIdentifier(any())).thenThrow(new NotaFiscalNotFoundException(""));
 
-            // Act & Assert
-            EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> {
+            assertThrows(NotaFiscalNotFoundException.class, () -> {
                 notaFiscalService.updateNotaFiscal(notaFiscalUpdateDto);
             });
             verify(notaFiscalRepository, never()).saveAndFlush(any());

@@ -2,6 +2,8 @@ package com.edu.ManagementPlayground.Service;
 
 import com.edu.ManagementPlayground.Dto.SupplierRegisterDto;
 import com.edu.ManagementPlayground.Entity.Supplier;
+import com.edu.ManagementPlayground.Exception.SupplierAlreadyExistsException;
+import com.edu.ManagementPlayground.Exception.SupplierNotFoundException;
 import com.edu.ManagementPlayground.Repository.SupplierRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -86,10 +88,8 @@ class SupplierServiceTest {
     class RegisterSupplierTests {
 
         @Test
-        @DisplayName("Should save supplier and return true when CNPJ is unique")
+        @DisplayName("Should save supplier and return true when CNPJ is unique.")
         void registerSupplier_WithUniqueCnpj_ShouldSaveAndReturnTrue() {
-            // Arrange
-            when(supplierRepository.existsByCnpj(supplierDto.cnpj())).thenReturn(false);
 
             // Act
             boolean result = supplierService.registerSupplier(supplierDto);
@@ -106,17 +106,14 @@ class SupplierServiceTest {
         }
 
         @Test
-        @DisplayName("Should not save supplier and return false when CNPJ already exists")
-        void registerSupplier_WithExistingCnpj_ShouldNotSaveAndReturnFalse() {
-            // Arrange
-            when(supplierRepository.existsByCnpj(supplierDto.cnpj())).thenReturn(true);
+        @DisplayName("Should not save supplier and throw exception when CNPJ already exists.")
+        void registerSupplier_WithExistingCnpj_ShouldNotSaveAndThrowSupplierAlreadyExistsException() {
+            when(supplierRepository.save(any())).thenThrow(new SupplierAlreadyExistsException(""));
 
-            // Act
-            boolean result = supplierService.registerSupplier(supplierDto);
-
-            // Assert
-            assertFalse(result);
-            verify(supplierRepository, never()).save(any(Supplier.class));
+            assertThrows(SupplierAlreadyExistsException.class, () -> {
+                supplierService.registerSupplier(supplierDto);
+            });
+            verify(supplierRepository, times(1)).save(any(Supplier.class));
         }
     }
 
@@ -146,16 +143,11 @@ class SupplierServiceTest {
         }
 
         @Test
-        @DisplayName("Should not update and return false when supplier does not exist")
-        void updateSupplier_WhenSupplierDoesNotExist_ShouldNotUpdateAndReturnFalse() {
-            // Arrange
-            when(supplierRepository.findByCnpj(supplierDto.cnpj())).thenReturn(Optional.empty());
-
-            // Act
-            boolean result = supplierService.updateSupplier(supplierDto);
-
-            // Assert
-            assertFalse(result);
+        @DisplayName("Should not update and throw exception when supplier does not exist")
+        void updateSupplier_WhenSupplierDoesNotExist_ShouldNotUpdateAndThrowSupplierNotFoundException() {
+            assertThrows(SupplierNotFoundException.class, () -> {
+                supplierService.updateSupplier(supplierDto);
+            });
             verify(supplierRepository, never()).save(any(Supplier.class));
         }
     }

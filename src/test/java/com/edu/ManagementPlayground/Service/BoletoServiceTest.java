@@ -6,8 +6,9 @@ import com.edu.ManagementPlayground.Dto.BoletoUpdateDto;
 import com.edu.ManagementPlayground.Entity.Boleto;
 import com.edu.ManagementPlayground.Entity.NotaFiscal;
 import com.edu.ManagementPlayground.Enum.StorageContext;
+import com.edu.ManagementPlayground.Exception.BoletoAlreadyExistsException;
+import com.edu.ManagementPlayground.Exception.BoletoNotFoundException;
 import com.edu.ManagementPlayground.Repository.BoletoRepository;
-import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -118,6 +119,32 @@ class BoletoServiceTest {
             assertEquals(mockResource, result);
             verify(storageService, times(1)).loadAsResource(fileReference, StorageContext.BOLETO);
         }
+
+        @Test
+        @DisplayName("Should return a Single Boleto")
+        void getSingleBoleto_ShouldReturnOneDto(){
+            NotaFiscal notaFiscalDummy = new NotaFiscal();
+            notaFiscalDummy.setId(1L);
+            Boleto boletoDummy = new Boleto("123", LocalDate.now(), BigDecimal.TEN, 1, "boleto01.pdf", notaFiscalDummy);
+            when(boletoRepository.findById(1L)).thenReturn(Optional.of(boletoDummy));
+
+            BoletoResponseDto serviceReturn = boletoService.getBoleto(1L);
+
+            assertNotNull(serviceReturn);
+            verify(boletoRepository, times(1)).findById(anyLong());
+            assertEquals(boletoDummy.getId(), serviceReturn.id());
+        }
+
+        @Test
+        @DisplayName("Should throw BoletoNotFoundException")
+        void getSingleComprovantePagamento_ShouldThrowComprovantePagamentoNotFoundException(){
+            when(boletoRepository.findById(1L)).thenThrow(new BoletoNotFoundException(""));
+
+            assertThrows(BoletoNotFoundException.class, () -> {
+                        boletoService.getBoleto(1L);
+                    }
+            );
+        }
     }
 
     @Nested
@@ -127,11 +154,10 @@ class BoletoServiceTest {
         @DisplayName("Should persist a Boleto that does not exists yet.")
         void registerBoleto_WhenBoletoDoesNotExist_ShouldSaveAndReturnTrue() {
             // Arrange
-            String savedFilePath = "upload/boleto01.pdf";
-            NotaFiscal mockNotaFiscal = new NotaFiscal();
-            when(boletoRepository.existsByTypeableLine(boletoRegisterDto.typeableLine())).thenReturn(false);
-            when(notaFiscalService.getNotaFiscalReference(boletoRegisterDto.notaFiscalId())).thenReturn(mockNotaFiscal);
-            when(storageService.storeFile(mockFile, StorageContext.BOLETO)).thenReturn(savedFilePath);
+            NotaFiscal notaFiscalDummy = new NotaFiscal();
+            notaFiscalDummy.setId(1L);
+            when(notaFiscalService.getNotaFiscalReference(boletoRegisterDto.notaFiscalId())).thenReturn(notaFiscalDummy);
+            when(storageService.storeFile(any(), any())).thenReturn("boleto01.pdf");
 
             // Act
             String result = boletoService.registerBoleto(boletoRegisterDto);
@@ -143,29 +169,31 @@ class BoletoServiceTest {
             Boleto capturedBoleto = boletoCaptor.getValue();
             assertEquals(boletoRegisterDto.typeableLine(), capturedBoleto.getTypeableLine());
             assertEquals(boletoRegisterDto.value(), capturedBoleto.getValue());
-            assertEquals(savedFilePath, capturedBoleto.getFileReference());
-            assertEquals(mockNotaFiscal, capturedBoleto.getNotaFiscal());
+            assertEquals("boleto01.pdf", capturedBoleto.getFileReference());
+            assertEquals(notaFiscalDummy, capturedBoleto.getNotaFiscal());
         }
         @Test
         @DisplayName("Should not save new Boleto if its Typeable Line already exists on db.")
-        void registerBoleto_WhenBoletoAlreadyExists_ShouldNotSaveAndReturnFalse() {
+        void registerBoleto_WhenBoletoAlreadyExists_ShouldThrowBoletoAlreadyExistsException() {
             // Arrange
-            when(boletoRepository.existsByTypeableLine(boletoRegisterDto.typeableLine())).thenReturn(true);
+            NotaFiscal notaFiscalDummy = new NotaFiscal();
+            notaFiscalDummy.setId(1L);
+            when(notaFiscalService.getNotaFiscalReference(1L)).thenReturn(notaFiscalDummy);
+            when(storageService.storeFile(any(), any())).thenReturn("boleto0.pdf");
+            when(boletoRepository.save(any())).thenThrow(new BoletoAlreadyExistsException(""));
 
-            // Act
-            String result = boletoService.registerBoleto(boletoRegisterDto);
-
-            // Assert
-            assertNotNull(result);
-            verify(notaFiscalService, never()).getNotaFiscalReference(anyLong());
-            verify(storageService, never()).storeFile(any(), any());
-            verify(boletoRepository, never()).save(any(Boleto.class));
+            assertThrows(BoletoAlreadyExistsException.class, () -> {
+                boletoService.registerBoleto(boletoRegisterDto);
+            });
+            verify(notaFiscalService, times(1)).getNotaFiscalReference(anyLong());
+            verify(storageService, times(1)).storeFile(any(), any());
+            verify(boletoRepository, times(1)).save(any(Boleto.class));
+            verify(storageService, times(1)).deleteFile(any(), any());
         }
         @Test
         @DisplayName("Should not save Boleto when StorageService throws RuntimeException.")
         void registerBoleto_WhenStorageServiceFails_ShouldNotSaveBoleto() {
             // Arrange
-            when(boletoRepository.existsByTypeableLine(anyString())).thenReturn(false);
             when(notaFiscalService.getNotaFiscalReference(anyLong())).thenReturn(new NotaFiscal());
             when(storageService.storeFile(any(), any())).thenThrow(new RuntimeException("Disk is full!"));
 
@@ -186,7 +214,7 @@ class BoletoServiceTest {
             // Arrange
             Boleto existingBoleto = new Boleto();
             existingBoleto.setTypeableLine("123456789");
-            existingBoleto.setFileReference("uploads/boleto01.pdf");
+            existingBoleto.setFileReference("boleto01.pdf");
             existingBoleto.setValue(new BigDecimal("200.00"));
             NotaFiscal notaFiscalReference = new NotaFiscal();
             notaFiscalReference.setNumberIdentifier("NF-002");
@@ -242,13 +270,12 @@ class BoletoServiceTest {
             verify(boletoRepository, times(1)).saveAndFlush(any(Boleto.class));
         }
         @Test
-        @DisplayName("Should throw EntityNotFoundException.")
-        void updateBoleto_WhenBoletoNotFound_ShouldThrowEntityNotFoundException() {
+        @DisplayName("Should throw BoletoNotFoundException.")
+        void updateBoleto_WhenBoletoNotFound_ShouldThrowBoletoNotFoundException() {
             // Arrange
-            when(boletoRepository.findByTypeableLine(boletoUpdateDto.typeableLine())).thenReturn(Optional.empty());
+            when(boletoRepository.findByTypeableLine(any())).thenThrow(new BoletoNotFoundException(""));
 
-            // Act & Assert
-            EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> {
+            assertThrows(BoletoNotFoundException.class, () -> {
                 boletoService.updateBoleto(boletoUpdateDto);
             });
             verify(boletoRepository, never()).saveAndFlush(any());

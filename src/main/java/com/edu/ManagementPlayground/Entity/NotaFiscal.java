@@ -60,6 +60,10 @@ public class NotaFiscal {
         return supplier;
     }
 
+    public void setId(long id) {
+        this.id = id;
+    }
+
     public void setNumberIdentifier(String numberIdentifier) {
         this.numberIdentifier = numberIdentifier;
     }
