@@ -10,10 +10,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -43,6 +40,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HttpMessageNotReadableException.class)
     private ResponseEntity<?> handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
         return ResponseEntity.status(400).body(Map.of("Error: ", "Invalid JSON Structure."));
+    }
+
+    @ExceptionHandler(NoSuchElementException.class)
+    private ResponseEntity<?> handleNoSuchElementException(NoSuchElementException e) {
+        return ResponseEntity.status(404).body(Map.of("Error: ", "Could not find the requested object."));
     }
 
     @ExceptionHandler(StorageException.class)

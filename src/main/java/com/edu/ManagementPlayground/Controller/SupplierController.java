@@ -31,7 +31,7 @@ public class SupplierController {
         return ResponseEntity.status(200).body(responseDto);
     }
 
-    @PostMapping("/register")
+    @PostMapping()
     public ResponseEntity<Void> createNewSupplier(@RequestBody SupplierRegisterDto supplierRegisterDto){
         boolean registrationOperation = supplierService.registerSupplier(supplierRegisterDto);
         if(registrationOperation){

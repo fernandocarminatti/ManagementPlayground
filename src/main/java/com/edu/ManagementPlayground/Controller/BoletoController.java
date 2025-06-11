@@ -38,15 +38,12 @@ public class BoletoController {
     @GetMapping("/uploads/{fileReference:.+}")
     public ResponseEntity<Resource> serveBoletoResource(@PathVariable String fileReference) {
         Resource fileToServe = boletoService.getBoletoFile(fileReference);
-        if(fileToServe.exists() && fileToServe.isReadable()){
-            return ResponseEntity.ok()
-                    .contentType(MediaType.valueOf(MediaType.APPLICATION_PDF_VALUE))
-                    .body(fileToServe);
-        }
-        return ResponseEntity.badRequest().build();
+        return ResponseEntity.ok()
+                .contentType(MediaType.valueOf(MediaType.APPLICATION_PDF_VALUE))
+                .body(fileToServe);
     }
 
-    @PostMapping(value = "/register", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
+    @PostMapping(consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
     public ResponseEntity<Void> createBoleto(@Valid @ModelAttribute BoletoRegisterDto boletoRegisterDto){
         String boletoFileReference = boletoService.registerBoleto(boletoRegisterDto);
         return ResponseEntity.created(URI.create("v1/boletos/uploads/" + boletoFileReference)).build();

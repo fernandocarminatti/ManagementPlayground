@@ -38,15 +38,12 @@ public class ComprovantePagamentoController {
     @GetMapping("/uploads/{fileReference:.+}")
     public ResponseEntity<Resource> serveComprovanteFile(@PathVariable String fileReference) {
         Resource fileToServe = comprovantePagamentoService.getComprovantePagamentoFile(fileReference);
-        if(fileToServe.exists() && fileToServe.isReadable()){
-            return ResponseEntity.ok()
-                    .contentType(MediaType.valueOf(MediaType.APPLICATION_PDF_VALUE))
-                    .body(fileToServe);
-        }
-        return ResponseEntity.notFound().build();
+        return ResponseEntity.ok()
+                .contentType(MediaType.valueOf(MediaType.APPLICATION_PDF_VALUE))
+                .body(fileToServe);
     }
 
-    @PostMapping(value = "/register", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
+    @PostMapping(consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
     public ResponseEntity<Void> createComprovante(@Valid @ModelAttribute ComprovantePagamentoRegisterDto comprovantePagamentoRegisterDto){
         String comprovanteFileReference = comprovantePagamentoService.registerComprovantePagamento(comprovantePagamentoRegisterDto);
         return ResponseEntity.created(URI.create("v1/comprovantes/uploads/" + comprovanteFileReference)).build();

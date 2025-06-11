@@ -38,15 +38,13 @@ public class NotaFiscalController {
     @GetMapping("/uploads/{fileReference:.+}")
     public ResponseEntity<Resource> serveFile(@PathVariable String fileReference) {
         Resource fileToServe = notaFiscalService.getNotaFiscalFile(fileReference);
-        if(fileToServe.exists() && fileToServe.isReadable()){
-            return ResponseEntity.ok()
-                    .contentType(MediaType.valueOf(MediaType.APPLICATION_PDF_VALUE))
-                    .body(fileToServe);
-        }
-        return ResponseEntity.notFound().build();
+        return ResponseEntity.ok()
+                .contentType(MediaType.valueOf(MediaType.APPLICATION_PDF_VALUE))
+                .body(fileToServe);
+
     }
 
-    @PostMapping(value = "/register", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
+    @PostMapping(consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
     public ResponseEntity<Void> createNotaFiscal(@Valid @ModelAttribute NotaFiscalRegisterDto notaFiscalRegisterDto){
         String notaFiscalFileReference = notaFiscalService.registerNotaFiscal(notaFiscalRegisterDto);
         return ResponseEntity.created(URI.create("v1/notasfiscais/uploads/" + notaFiscalFileReference)).build();
