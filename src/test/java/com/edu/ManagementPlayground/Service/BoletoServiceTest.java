@@ -105,7 +105,7 @@ class BoletoServiceTest {
 
         @Test
         @DisplayName("Should return a Resource for the Boleto PDF file.")
-        void getNotaFiscalFile_ShouldReturnResourceFromStorageService() {
+        void getBoleto_ShouldReturnResourceFromStorageService() {
             // Arrange
             String fileReference = "uploads/boleto01.pdf";
             Resource mockResource = mock(Resource.class);
@@ -137,7 +137,7 @@ class BoletoServiceTest {
 
         @Test
         @DisplayName("Should throw BoletoNotFoundException")
-        void getSingleComprovantePagamento_ShouldThrowComprovantePagamentoNotFoundException(){
+        void getSingleBoleto_ShouldThrowBoletoNotFoundException(){
             when(boletoRepository.findById(1L)).thenThrow(new BoletoNotFoundException(""));
 
             assertThrows(BoletoNotFoundException.class, () -> {
