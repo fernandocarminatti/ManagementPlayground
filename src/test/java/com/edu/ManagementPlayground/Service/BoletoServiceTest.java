@@ -160,7 +160,7 @@ class BoletoServiceTest {
             when(storageService.storeFile(any(), any())).thenReturn("boleto01.pdf");
 
             // Act
-            String result = boletoService.registerBoleto(boletoRegisterDto);
+            String result = boletoService.createBoleto(boletoRegisterDto);
 
             // Assert
             assertNotNull(result);
@@ -183,7 +183,7 @@ class BoletoServiceTest {
             when(boletoRepository.save(any())).thenThrow(new BoletoAlreadyExistsException(""));
 
             assertThrows(BoletoAlreadyExistsException.class, () -> {
-                boletoService.registerBoleto(boletoRegisterDto);
+                boletoService.createBoleto(boletoRegisterDto);
             });
             verify(notaFiscalService, times(1)).getNotaFiscalReference(anyLong());
             verify(storageService, times(1)).storeFile(any(), any());
@@ -199,7 +199,7 @@ class BoletoServiceTest {
 
             // Act & Assert
             assertThrows(RuntimeException.class, () -> {
-                boletoService.registerBoleto(boletoRegisterDto);
+                boletoService.createBoleto(boletoRegisterDto);
             });
             verify(boletoRepository, never()).save(any(Boleto.class));
         }

@@ -30,7 +30,7 @@ public class NotaFiscalService {
         this.storageService = storageService;
     }
 
-    public Set<NotaFiscalResponseDto> getAllNotaFiscal(){
+    public Set<NotaFiscalResponseDto> getAllNotasFiscais(){
         return notaFiscalRepository.findAllWithSupplierId();
     }
 
@@ -56,7 +56,7 @@ public class NotaFiscalService {
     }
 
     @Transactional
-    public String registerNotaFiscal(NotaFiscalRegisterDto notaFiscalRegisterDto){
+    public String createNotaFiscal(NotaFiscalRegisterDto notaFiscalRegisterDto){
         Supplier supplierReference = supplierService.getSupplierReference(notaFiscalRegisterDto.supplierId());
         String savedFilePath = storageService.storeFile(notaFiscalRegisterDto.notaFiscalFile(), StorageContext.NOTAFISCAL);
         NotaFiscal notaFiscal = new NotaFiscal(
@@ -88,6 +88,6 @@ public class NotaFiscalService {
         notaFiscal.setTotalValue(notaFiscalUpdateDto.totalValue());
         notaFiscal.setSupplier(supplierReference);
 
-        notaFiscalRepository.saveAndFlush(notaFiscal);
+        notaFiscalRepository.save(notaFiscal);
     }
 }

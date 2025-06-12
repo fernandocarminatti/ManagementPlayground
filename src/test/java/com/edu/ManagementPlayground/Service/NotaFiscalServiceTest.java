@@ -90,7 +90,7 @@ class NotaFiscalServiceTest {
             when(notaFiscalRepository.findAllWithSupplierId()).thenReturn(expectedDtos);
 
             // Act
-            Set<NotaFiscalResponseDto> actualDtos = notaFiscalService.getAllNotaFiscal();
+            Set<NotaFiscalResponseDto> actualDtos = notaFiscalService.getAllNotasFiscais();
 
             // Assert
             assertNotNull(actualDtos);
@@ -156,7 +156,7 @@ class NotaFiscalServiceTest {
             when(storageService.storeFile(mockFile, StorageContext.NOTAFISCAL)).thenReturn(fileReference);
 
             // Act
-            String result = notaFiscalService.registerNotaFiscal(notaFiscalRegisterDto);
+            String result = notaFiscalService.createNotaFiscal(notaFiscalRegisterDto);
 
             // Assert
             assertNotNull(result);
@@ -178,7 +178,7 @@ class NotaFiscalServiceTest {
             when(notaFiscalRepository.save(any())).thenThrow(new NotaFiscalAlreadyExistsException(""));
 
             assertThrows(NotaFiscalAlreadyExistsException.class, () -> {
-                notaFiscalService.registerNotaFiscal(notaFiscalRegisterDto);
+                notaFiscalService.createNotaFiscal(notaFiscalRegisterDto);
             });
             verify(supplierService, times(1)).getSupplierReference(anyLong());
             verify(storageService, times(1)).storeFile(any(), any());
@@ -194,7 +194,7 @@ class NotaFiscalServiceTest {
 
             // Act & Assert
             assertThrows(RuntimeException.class, () -> {
-                notaFiscalService.registerNotaFiscal(notaFiscalRegisterDto);
+                notaFiscalService.createNotaFiscal(notaFiscalRegisterDto);
             });
             verify(notaFiscalRepository, never()).save(any(NotaFiscal.class));
         }

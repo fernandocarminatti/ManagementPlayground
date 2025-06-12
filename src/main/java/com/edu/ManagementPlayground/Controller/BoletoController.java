@@ -45,11 +45,11 @@ public class BoletoController {
 
     @PostMapping(consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
     public ResponseEntity<Void> createBoleto(@Valid @ModelAttribute BoletoRegisterDto boletoRegisterDto){
-        String boletoFileReference = boletoService.registerBoleto(boletoRegisterDto);
+        String boletoFileReference = boletoService.createBoleto(boletoRegisterDto);
         return ResponseEntity.created(URI.create("v1/boletos/uploads/" + boletoFileReference)).build();
     }
 
-    @PutMapping(value = "/update", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
+    @PutMapping(consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
     public ResponseEntity<Void> updateBoleto(@Valid @ModelAttribute BoletoUpdateDto boletoUpdateDto){
         boletoService.updateBoleto(boletoUpdateDto);
         return ResponseEntity.noContent().build();

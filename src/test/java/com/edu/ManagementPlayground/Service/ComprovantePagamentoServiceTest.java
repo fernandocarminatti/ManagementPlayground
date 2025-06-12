@@ -155,7 +155,7 @@ class ComprovantePagamentoServiceTest {
             when(storageService.storeFile(any(), any())).thenReturn("comprovante01.pdf");
 
             // Act
-            String result = comprovantePagamentoService.registerComprovantePagamento(comprovantePagamentoRegisterDto);
+            String result = comprovantePagamentoService.createComprovantePagamento(comprovantePagamentoRegisterDto);
 
             // Assert
             assertNotNull(result);
@@ -177,7 +177,7 @@ class ComprovantePagamentoServiceTest {
             when(comprovantePagamentoRepository.save(any())).thenThrow(new ComprovantePagamentoAlreadyExistsException(""));
 
             assertThrows(ComprovantePagamentoAlreadyExistsException.class, () -> {
-                comprovantePagamentoService.registerComprovantePagamento(comprovantePagamentoRegisterDto);
+                comprovantePagamentoService.createComprovantePagamento(comprovantePagamentoRegisterDto);
             });
             verify(boletoService, times(1)).getBoletoReference(anyLong());
             verify(storageService, times(1)).storeFile(any(), any());
@@ -191,7 +191,7 @@ class ComprovantePagamentoServiceTest {
             when(storageService.storeFile(any(), any())).thenThrow(new RuntimeException("Disk is full!"));
 
             assertThrows(RuntimeException.class, () -> {
-                comprovantePagamentoService.registerComprovantePagamento(comprovantePagamentoRegisterDto);
+                comprovantePagamentoService.createComprovantePagamento(comprovantePagamentoRegisterDto);
             });
             verify(comprovantePagamentoRepository, never()).save(any(ComprovantePagamento.class));
         }

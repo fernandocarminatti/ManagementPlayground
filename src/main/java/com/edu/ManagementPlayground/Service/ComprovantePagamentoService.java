@@ -30,7 +30,7 @@ public class ComprovantePagamentoService {
         this.storageService = storageService;
     }
 
-    public Set<ComprovantePagamentoResponseDto> getAllComprovante() { return comprovantePagamentoRepository.findAllProjection(); }
+    public Set<ComprovantePagamentoResponseDto> getAllComprovantes() { return comprovantePagamentoRepository.findAllProjection(); }
 
     public ComprovantePagamentoResponseDto getComprovante(long id){
         ComprovantePagamento comprovantePagamento = comprovantePagamentoRepository.findById(id).orElseThrow(() -> new ComprovantePagamentoNotFoundException("Could not find any Comprovante Pagamento with provided attributes.") );
@@ -49,7 +49,7 @@ public class ComprovantePagamentoService {
     }
 
     @Transactional
-    public String registerComprovantePagamento(ComprovantePagamentoRegisterDto comprovantePagamentoRegisterDto){
+    public String createComprovantePagamento(ComprovantePagamentoRegisterDto comprovantePagamentoRegisterDto){
         Boleto boletoReference = boletoService.getBoletoReference(comprovantePagamentoRegisterDto.boletoId());
         String savedFilePath = storageService.storeFile(comprovantePagamentoRegisterDto.comprovanteFile(),  StorageContext.COMPROVANTEPAGAMENTO);
         ComprovantePagamento comprovante = new ComprovantePagamento(
@@ -79,6 +79,6 @@ public class ComprovantePagamentoService {
         comprovantePagamento.setValue(comprovantePagamentoUpdateDto.value());
         comprovantePagamento.setBoleto(boletoReference);
 
-        comprovantePagamentoRepository.saveAndFlush(comprovantePagamento);
+        comprovantePagamentoRepository.save(comprovantePagamento);
     }
 }

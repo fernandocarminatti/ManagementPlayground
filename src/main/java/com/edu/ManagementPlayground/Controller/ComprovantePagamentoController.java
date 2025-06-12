@@ -25,7 +25,7 @@ public class ComprovantePagamentoController {
 
     @GetMapping()
     public ResponseEntity<Set<ComprovantePagamentoResponseDto>> getAllComprovantes(){
-        Set<ComprovantePagamentoResponseDto> allComprovantes = comprovantePagamentoService.getAllComprovante();
+        Set<ComprovantePagamentoResponseDto> allComprovantes = comprovantePagamentoService.getAllComprovantes();
         return ResponseEntity.ok(allComprovantes);
     }
 
@@ -45,11 +45,11 @@ public class ComprovantePagamentoController {
 
     @PostMapping(consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
     public ResponseEntity<Void> createComprovante(@Valid @ModelAttribute ComprovantePagamentoRegisterDto comprovantePagamentoRegisterDto){
-        String comprovanteFileReference = comprovantePagamentoService.registerComprovantePagamento(comprovantePagamentoRegisterDto);
+        String comprovanteFileReference = comprovantePagamentoService.createComprovantePagamento(comprovantePagamentoRegisterDto);
         return ResponseEntity.created(URI.create("v1/comprovantes/uploads/" + comprovanteFileReference)).build();
     }
 
-    @PutMapping(value = "/update", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
+    @PutMapping( consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
     public ResponseEntity<Void> updateComprovante(@Valid @ModelAttribute ComprovantePagamentoUpdateDto comprovantePagamentoUpdateDto){
         comprovantePagamentoService.updateComprovantePagamento(comprovantePagamentoUpdateDto);
         return ResponseEntity.noContent().build();

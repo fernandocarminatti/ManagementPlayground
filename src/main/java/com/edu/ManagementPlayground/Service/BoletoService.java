@@ -52,7 +52,7 @@ public class BoletoService {
     }
 
     @Transactional
-    public String registerBoleto(BoletoRegisterDto boletoRegisterDto){
+    public String createBoleto(BoletoRegisterDto boletoRegisterDto){
         NotaFiscal notaFiscalReference = notaFiscalService.getNotaFiscalReference(boletoRegisterDto.notaFiscalId());
         String savedFilePath = storageService.storeFile(boletoRegisterDto.boletoFile(), StorageContext.BOLETO);
         Boleto boleto = new Boleto(

@@ -25,7 +25,7 @@ public class NotaFiscalController {
 
     @GetMapping()
     public ResponseEntity<Set<NotaFiscalResponseDto>> getAllSuppliers(){
-        Set<NotaFiscalResponseDto> allSuppliers = notaFiscalService.getAllNotaFiscal();
+        Set<NotaFiscalResponseDto> allSuppliers = notaFiscalService.getAllNotasFiscais();
         return ResponseEntity.ok(allSuppliers);
     }
 
@@ -46,11 +46,11 @@ public class NotaFiscalController {
 
     @PostMapping(consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
     public ResponseEntity<Void> createNotaFiscal(@Valid @ModelAttribute NotaFiscalRegisterDto notaFiscalRegisterDto){
-        String notaFiscalFileReference = notaFiscalService.registerNotaFiscal(notaFiscalRegisterDto);
+        String notaFiscalFileReference = notaFiscalService.createNotaFiscal(notaFiscalRegisterDto);
         return ResponseEntity.created(URI.create("v1/notasfiscais/uploads/" + notaFiscalFileReference)).build();
     }
 
-    @PutMapping(value = "/update", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
+    @PutMapping(consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
     public ResponseEntity<Void> updateNotaFiscal(@Valid @ModelAttribute NotaFiscalUpdateDto notaFiscalUpdateDto){
         notaFiscalService.updateNotaFiscal(notaFiscalUpdateDto);
         return ResponseEntity.noContent().build();
