@@ -11,7 +11,6 @@ import java.util.Set;
 
 @Repository
 public interface BoletoRepository extends JpaRepository<Boleto, Long> {
-    boolean existsByTypeableLine(String typeableLine);
     Optional<Boleto> findByTypeableLine(String typeableLine);
     @Query("SELECT new com.edu.ManagementPlayground.Dto.BoletoResponseDto(bl.id, bl.typeableLine, bl.dueDate, bl.value, bl.paymentStatus, bl.fileReference) FROM Boleto bl")
     Set<BoletoResponseDto> findAllProjection();

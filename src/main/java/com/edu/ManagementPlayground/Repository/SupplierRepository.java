@@ -8,7 +8,5 @@ import java.util.Optional;
 
 @Repository
 public interface SupplierRepository extends JpaRepository<Supplier, Long> {
-
-    boolean existsByCnpj(String cnpj);
     Optional<Supplier> findByCnpj(String cnpj);
 }

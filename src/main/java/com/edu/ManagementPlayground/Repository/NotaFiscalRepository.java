@@ -11,8 +11,6 @@ import java.util.Set;
 
 @Repository
 public interface NotaFiscalRepository extends JpaRepository<NotaFiscal, Long> {
-    boolean existsByfileReference(String fileReference);
-    boolean existsByNumberIdentifier(String numberIdentifier);
     Optional<NotaFiscal> findByNumberIdentifier(String numberIdentifier);
     @Query("SELECT new com.edu.ManagementPlayground.Dto.NotaFiscalResponseDto(nf.id, nf.numberIdentifier, nf.issueDate, nf.totalValue, nf.fileReference, nf.supplier.id) FROM NotaFiscal nf")
     Set<NotaFiscalResponseDto> findAllWithSupplierId();
